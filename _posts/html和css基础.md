@@ -7,122 +7,605 @@ tags:
 categories: css 
 description: html超文本标记语言，层叠样式表 (Cascading Style Sheets，缩写为 CSS），是一种 样式表 语言，用来描述 HTML 或 XML（包括如 SVG、MathML、XHTML 之类的 XML 分支语言）文档的呈现。CSS 描述了在屏幕、纸质、音频等其它媒体上的元素应该如何被渲染的问题。
 ---
->HTML（HyperText Markup Language，超文本标记语言） 是用来定义网页结构的一种描述语言。
+
+# HTML & CSS课程概述
+
+## 术语
+
+1.web
+
+互联网
+
+2.w3c
+
+万维网联盟，非盈利的组织:w3.org，为互联网提供各种标准
+
+3.xml
+
+可扩展的标记语言：extension markup language，用于定义文档结构
+
+```
+请在每周周一下午两点，从人人网下载最新美剧《权力的游戏》
+```
+
+```xml
+<任务>
+    <执行日期> 每周一 </执行日期>
+    <执行时间> 下午两点 </执行时间>
+    <下载地址> 人人网 </下载地址>
+    <下载目标> 最新版《权力的游戏》 </下载目标>
+</任务>
+```
+
+## 什么是HTML
+
+HTML：是w3c组织定义的语言标准，（HyperText Markup Language，超文本标记语言） 是用来定义网页结构的一种描述语言。
+
+## 什么是CSS
+
+CSS：是w3c定义的语言标准，层叠样式表(Cascading Style Sheets，缩写为 CSS），CSS 描述了在屏幕、纸质、音频等其它媒体上的元素应该如何被渲染的问题
+
+## 执行HTML CSS
+
+HTML、CSS -> 浏览器内核 -> 页面
+
+浏览器：
+
+1.shell：外壳
+2.core：内核(js执行引擎，渲染引擎)
+
+| 名称               | 内核 |
+| --------          |:-----|
+| ie                |Trident|
+| firefox           |Gecko|
+| google chrome     |webkit/blink|
+| safari             |webkit|
+| opera              |presto|
 
 
+
+# 第一个网页
+
+## 元素
+
+> 其他叫法:标签、标记
+
+元素 = 起始标记（begin tag） + 结束标记（end tag） + 元素内容 + 元素属性
+
+属性 = 属性名 + 属性值
+
+属性的分类：
+
+- 局部属性：某些元素特有的属性
+- 全局属性：所有元素通用
+
+有些元素没有结束标记，这样的元素叫做：**空元素**
+
+空元素的两种写法：
 
 ```
 <meta charset="UTF-8">
+<meta charset="UTF-8" />
 ```
-
 此特性声明当前文档所使用的字符编码，常用的字符编码有utf-8、gb2312、gbk(繁体)，推荐使用utf-8
 
 
-## 基本标签
-* strong 粗体
-* em 斜体
-* del 中划线
-* address 地址
-* ol li 有序列表
-* ul li 无序
-* a
-a标签的作用
-1、超链接
-2、锚点
-3、打电话
-4、发邮件
+## 标准的文档结构
 
-## 单标签
-* meta
-* br
-* hr
+```html
+<!DOCTYPE html>
+```
 
-## pre标签
-预格式化文本元元素
-空白折叠:在源代码中连续空白字符(空格、换行、制表)，在页面显示时，会被折叠为一个空格
-例外 ：在pre元素内容中不会出现空白折叠
-在pre元素内部出现的内容，会按照源代码格式显示到页面上
-该元素通常用于在网页中显示一些代码
-pre元素功能的本质:他有一个默认的css属性
+文档声明，告诉浏览器，当前文档使用的HTML标准是HTML5。
 
-## html实体
-一个HTML 实体 是一段文本（“串”），以与符号（开始&），并用分号（结束;）。实体经常用于显示保留字符（否则将被解释为HTML代码），如&copy代表版权符号。具体参考连接：https://dev.w3.org/html5/html-author/charref
+不写文档声明，将导致浏览器进入怪异渲染模式。
+
+```html
+<html lang="en">
+</html
+```
+
+根元素，一个页面最多只能一个，并且该元素是所有其他元素的父元素或祖先元素。
+
+HTML5版本中没有强制要求书写该元素
+
+lang属性：language，全局属性，表示该元素内部使用的文字是使用哪一种自然语言书写而成的。
+
+```html
+<head>
+
+</head>
+```
+
+文档头，文档头内部的内容，不会显示到页面上。
+
+```html
+<meta>
+```
+
+文档的元数据：附加信息。
+
+```html
+<title>Document</title>
+```
+
+网页标题
+
+```html
+<body>
+</body>
+```
+
+文档体，页面上所有要参与显示的元素，都应该放置到文档体中。
 
 
-## HTML map
+html最终的初始结构
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>淘宝购物车</title>
+</head>
+
+<body>
+</body>
+</html>
+```
+
+
+
+
+
+
+
+
+# 语义化
+
+## 什么是语义化
+
+1.每一个html元素都有具体的含义
+
+a元素：超链接
+
+p元素：段落
+
+h1元素：一级标题
+
+2.所有元素与展示效果无关
+
+元素展示到页面中的效果，应该由CSS决定。
+
+因为浏览器带有默认的CSS样式，所以每个元素有一些默认样式。
+
+
+**重要：选择什么元素，取决于内容的含义，而不是显示出的效果**
+
+## 为什么需要语义化？
+
+1. 为了搜索引擎优化（SEO）
+
+搜索引擎：百度、搜搜、Bing、Google
+
+每隔一段时间，搜索引擎会从整个互联网中，抓取页面源代码
+
+2. 为了让浏览器理解网页
+
+阅读模式、语音模式
+
+
+# 文本元素
+
+## h 
+
+标题,h1~h6表示1级标题~6级标题
+
+## p 
+
+段落
+
+>lorem,乱数假文,主要的目的为测试文章或文字在不同字型、版型下看起来的效果，通常网站还没建设好时会出现这段文字
+
+## span 
+
+无语义
+
+仅用于设计样式
+
+>以前：某些元素在显示时会独占一行（块级元素），而某些元素不会（行级元素）
+>到了HTML5，已经弃用这种说法。在 HTML5，这种区别被一个更复杂的[内容类别](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories)代替
+
+## pre
+
+预格式化文本元素
+
+空白折叠：在源代码中的连续空白字符（空格、换行、制表），在页面显示时，会被折叠为一个空格
+
+例外:在pre元素中的内容不会出现空白折叠
+
+该元素通常用于在网页中显示一些代码。
+
+pre元素功能的本质：它有一个默认的css属性
+
+> 显示代码时，通常外面套code元素，code表示代码区域。
+
+```js
+<code style="white-space:pre">
+    var i = 2;
+    if(i){
+        console.log(i);
+    }
+</code>
+```
+
+# HTML实体
+
+[实体字符](https://dev.w3.org/html5/html-author/charref)， HTML Entity
+
+一个HTML 实体 是一段文本（“串”），以与符号（开始&），并用分号（结束;）。实体经常用于显示保留字符（否则将被解释为HTML代码），实体字符通常用于在页面中显示一些特殊符号。
+
+- 小于符号
+
+```
+&lt;
+```
+
+- 大于符号
+
+```
+&gt;
+```
+
+- 空格符号
+
+```
+&nbsp;
+```
+
+- 版权符号
+
+```
+&copy;
+```
+
+- &符号
+
+```
+&amp;
+```
+
+
+# a元素
+
+超链接
+
+## href属性
+
+通常表示跳转地址
+
+1.普通链接
+
+```html
+<a href="https://www.baidu.com">百度</a>
+```
+
+2.锚链接
+
+```html
+<!--让文章内容尽可能的多，出现滚动条后点击 可以出现想要明显的效果-->
+<a href="#chapter1">章节1</a>
+<a href="#chapter2">章节2</a>
+
+
+<h2 id="chapter1">章节1</h2>
+<p>Lorem ipsum dolor sit amet</p>
+<h2 id="chapter2">章节1</h2>
+<p>Lorem ipsum dolor sit amet</p>
+```
+
+3.功能链接
+点击后，触发某个功能
+
+- 执行JS代码，javascript:
+- 发送邮件，mailto:
+- 拨号，tel:
+
+```html
+<a href="javascript:alert('你好！')">
+    弹出：你好！
+</a> -->
+
+<a href="mailto:234234324324@qq.com">
+    点击给我发送邮件
+</a> 
+
+<a href="tel:14354663333">
+    点击给我拨打电话
+</a>
+```
+
+## target属性
+
+表示跳转窗口位置。
+
+target的取值：
+
+- _self：在当前页面窗口中打开，默认值
+- _blank: 在新窗口中打开
+
+```html
+<a href="https://douyu.com" target="_blank" >
+    斗鱼直播
+</a>
+```
+
+# 路径的写法
+
+## 站内资源和站外资源
+
+站内资源：当前网站的资源
+
+站外资源：非当前网站的资源
+
+## 绝对路径和相对路径
+
+站外资源：绝对路径
+
+站内资源：相对路径
+
+1.绝对路径
+
+绝对路径的书写格式：
+
+url地址：
+
+```
+协议名://主机名:端口号/路径
+schema://host:port/path
+```
+
+当跳转目标和当前页面的协议相同时，可以省略协议
+
+2.相对路径
+
+以./开头，./表示当前资源所在的目录
+
+可以书写../表示返回上一级目录
+
+相对路径中：./可以省略
+
+
+# 图片元素
+
+## img元素
+
+image缩写,空元素
+
+src属性:source
+
+alt属性:当资源失效时,将使用该属性的文字代替图片
+
+## 和a元素联用
+
+
+```html
+<a target="_blank" href="https://baike.baidu.com/item/%E5%A4%AA%E9%98%B3%E7%B3%BB/173281?fr=aladdin">
+            <img usemap="#solarMap" src="./img/solar.jpg" alt="这是一张太阳系的图片">
+</a>
+```
+
+
+## 和map元素联用
+
+map：地图
+
+map的子元素：area
+
+衡量坐标时，为了避免衡量误差，需要使用专业的衡量工具：
+
 map元素使用具有area元素来定义图像映射（可点击链接区域）。
-```
-<map name="primary">
-    <area shape="circle" coords="433,373,75" href="text.html" alt="">
-    <area shape="circle" coords="" href="text1.html" alt="">
+
+ps、pxcook
+
+```html
+<a target="_blank" href="https://baike.baidu.com/item/%E5%A4%AA%E9%98%B3%E7%B3%BB/173281?fr=aladdin">
+    <img usemap="#solarMap" src="./img/solar.jpg" alt="这是一张太阳系的图片">
+</a>
+<map name="solarMap">
+    <area shape="circle" coords="360,204,48" href="https://baike.baidu.com/item/%E6%9C%A8%E6%98%9F/222105?fr=aladdin" target="_blank">
+    <area shape="rect" coords="323,282,395,320" href="https://baike.baidu.com/item/%E6%9C%A8%E6%98%9F/222105?fr=aladdin" target="_blank">
+    <area shape="poly" coords="601,371,645,312,678,338,645,392" href="https://baike.baidu.com/item/%E5%86%A5%E7%8E%8B%E6%98%9F/137498?fr=aladdin" target="_blank">
 </map>
-<img src="img/美女_5.jpg" usemap="#primary" alt="">
 ```
 
-## html figure元素
+## 和figure元素联用
+
+指代、定义，通常用于把图片、图片标题、描述包裹起来
+
+子元素：figcaption
+
 主要用于html5的语义化
+
 通常用域把图片、图片标题、描述包裹起来,figure里面可以用h等元素
+
 figcaption指标题 里面可以放h等标签
-```
-<figure>
-    <img src="img/美女_5.jpg" alt="A robotic monster over the letters MDN.">
-    <figcaption>MDN Logo</figcaption>
+
+```html
+ <figure>
+    <a target="_blank" href="https://baike.baidu.com/item/%E5%A4%AA%E9%98%B3%E7%B3%BB/173281?fr=aladdin">
+        <img usemap="#solarMap" src="./img/solar.jpg" alt="这是一张太阳系的图片">
+    </a>
+    <figcaption>
+        <h2>太阳系</h2>
+    </figcaption>
+    <p>
+        太阳系是以太阳为中心，和所有受到太阳的引力约束天体的集合体。包括八大行星（由离太阳从近到远的顺序：水星、金星、地球、火星、木星、土星、天王星、海王星）、以及至少173颗已知的卫星、5颗已经辨认出来的矮行星和数以亿计的太阳系小天体,和哈雷彗星。
+    </p>
 </figure>
 ```
 
-## html 布尔属性
-某些元素，只有2种状态:1、不写 2、取值为属性名,这种属性叫布尔属性
 
-## html video 属性
-controls:控制控件的显示
-autoplay:自动播放
-muted:静音播放
-loop:循环播放
 
-格式兼容写法
 
-```
+
+
+
+
+# 多媒体元素
+
+video 视频
+
+audio 音频
+
+## video
+
+controls: 控制控件的显示，取值只能为controls
+
+某些属性，只有两种状态：1. 不写   2. 取值为属性名，这种属性叫做布尔属性
+
+布尔属性，在HTML5中，可以不用书写属性值
+
+autoplay: 布尔属性，自动播放。
+
+muted: 布尔属性，静音播放。
+
+loop: 布尔属性，循环播放
+
+## audio
+
+和视频完全一致
+
+## 兼容性
+
+
+1. 旧版本的浏览器不支持这两个元素
+2. 不同的浏览器支持的音视频格式可能不一致
+
+```html
 <video controls autoplay loop muted style="width: 100px">
     <source src="media/open.mp4">
     <source src="media/open.webm">
     <p>
         对不起你的浏览器不支持
     </p>
-
 </video>
 ```
 
 
+# 列表元素
+
+## 有序列表
+
+ol: ordered list
+
+li：list item 
+
+## 无序列表
+
+把ol改成ul
+
+ul：unordered list
+
+无序列表常用于制作菜单 或 新闻列表。
+
+
+## 定义列表
+
+通常用于一些术语的定义
+
+dl: definition list
+
+dt: definition title
+
+dd: definition description
+
+
+# 容器元素
+
+容器元素：该元素代表一个块区域，内部用于放置其他元素
+
+## div元素
+
+没有语义
+
 ## 语义化容器元素
 
-header:页头，也可以用表示文章的头部
-footer:页脚，也可以用表示文章的底部
-article:通常用于表示整篇文章
-section:通常用于表示文章的章节
-aside:通常用于表示侧边栏
+header: 通常用于表示页头，也可以用于表示文章的头部
 
-## html之空格
-html中空格代表文本分隔符,主要用来分割英文单词,html中要想用空格,需要一些特殊的转义，如
+footer: 通常用于表示页脚，也可以用于表示文章的尾部
 
-```
-&nbsp;空格
-&lt;<
-&gt;>
-```
-### 简单示例1
+article: 通常用于表示整篇文章
 
-```
-请输入用户名的实现
+section: 通常用于表示文章的章节
+
+aside: 通常用于表示侧边栏
+
+# 元素包含关系
+
+以前：块级元素可以包含行级元素，行级元素不可以包含块级元素，a元素除外
+
+元素的包含关系由元素的内容类别决定。
+
+例如，查看h1元素中是否可以包含p元素
+
+总结：
+
+1. 容器元素中可以包含任何元素
+2. a元素中几乎可以包含任何元素
+3. 某些元素有固定的子元素（ul>li，ol>li，dl>dt+dd）
+4. 标题元素和段落元素不能相互嵌套，并且不能包含容器元素
+
+
+# 为网页添加样式
+
+## 术语解释
+
+```css
+h1{
+    color:red;
+    background-color:lightblue;
+    text-align: center;
+}
 ```
 
-## 主流浏览器
-| 名称               | 内核 |
-| --------          |:-----|
-| ie                |trident|
-| firefox           |Gecko|
-| google chrome     |webkit/blink|
-| safari             |webkit|
-| opera              |presto|
+CSS规则 = 选择器 + 声明块
+
+
+### 选择器
+
+选择器：选中元素
+
+1. ID选择器：选中的是对应id值的元素
+2. 元素选择器
+3. 类选择器
+
+### 声明块
+
+出现在大括号中
+
+声明块中包含很多声明（属性），每一个声明（属性）表达了某一方面的样式。
+
+## CSS代码书写位置
+
+1. 内部样式表
+
+书写在style元素中
+
+2. 内联样式表，元素样式表
+
+直接书写在元素的style属性中
+
+3. 外部样式表[推荐]
+
+将样式书写到独立的css文件中。
+
+1). 外部样式可以解决多页面样式重复的问题
+2). 有利于浏览器缓存，从而提高页面响应速度
+3). 有利于代码分离（HTML和CSS），更容易阅读和维护
+
+
+# 常见样式声明
 
 
 ## css选择器

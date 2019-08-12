@@ -145,5 +145,151 @@ os.path.isfile(path)   # 判断路径是否为文件
 os.path.isdir(path)   # 判断路径是否为目录
 ```
 
+* **os.system('clear')**  
+
+完成清屏：清屏和打印结合起来，形成滚动效果。
 
 
+
+
+
+## random模块
+
+该模块实现了各种分布的伪随机数生成器。
+
+* **random.choice(list)**
+生成一个列表中随机的项
+
+
+## smtplib模块
+
+python的smtplib提供了一种很方便的途径发送电子邮件。它对smtp协议进行了简单的封装。
+
+* **smtplib.SMTP_SSL(smtp_server)**
+
+开启发信服务，这里使用的是ssl加密传输
+smtp_server为发信服务器，一般需要去看自己邮箱的发信服务器，如163为:smtp.163.com
+
+* **server.connect(smtp_server,994)**
+
+连接到发信服务器
+994为发信服务器的端口
+
+* **server.login(from_addr,password)**
+
+from_addr:发信邮箱
+password:授权码
+登录发信邮箱
+
+
+* **server.sendmail(from_addr,to_addr,msg.as_string())**
+
+from_addr:发信邮箱
+to_addr:收信方,此处可以为一个列表
+msg:邮箱正文内容，此处构建邮箱内容需要引用email.mime.text、email.header模块
+
+
+下面示意一完整的发信示例
+
+```
+mport smtplib
+from email.mime.text import MIMEText
+from email.header import Header
+
+# 发信方信息:发信邮箱 163 163授权码
+from_addr='xxx@163.com'
+password='xxx'
+
+# 收信方
+to_addr=['xxx@mdtit.com','xxx@qq.com']
+
+
+
+# 发信服务器
+smtp_server = 'smtp.163.com'
+
+# 邮箱正文内容，第一个参数为内容，第二个参数为(plain 为纯文本) 第三个参数为编码
+msg=MIMEText('send by python','plain','utf-8')
+msg['Subject'] = Header('放假通知', 'utf-8')
+msg['From'] = Header(from_addr)
+msg['To'] = Header(','.join(to_addr))
+# 开启发信服务,这里使用的加密传输
+server=smtplib.SMTP_SSL(smtp_server)
+server.connect(smtp_server,994)
+
+# 登录发信邮箱
+server.login(from_addr,password)
+
+# 发送邮件
+print(server.sendmail(from_addr,to_addr,msg.as_string()))
+
+# 关闭服务器
+server.quit()
+```
+
+
+
+
+
+
+
+
+
+
+
+## MyQR模块
+
+
+生成二维码，picture可以是图像，也可以是动图
+
+* **myqr.run**
+
+myqr.run(
+     words='http://weixin.qq.com/r/kzlje9TEE4lsrZAY92yB',
+     # 扫描二维码后，显示的内容，或是跳转的链接
+     version=5,  # 设置容错率
+     level='H',  # 控制纠错水平，范围是L、M、Q、H，从左到右依次升高
+     picture='she.gif',  # 图片所在目录，可以是动图
+     colorized=True,  # 黑白(False)还是彩色(True)
+     contrast=1.0,  # 用以调节图片的对比度，1.0 表示原始图片。默认为1.0。
+     brightness=1.0,  # 用来调节图片的亮度，用法同上。
+     save_name='Python.gif',  # 控制输出文件名，格式可以是 .jpg， .png ，.bmp ，.gif
+     )
+
+```
+#生成普通二维码
+
+myqr.run(words='https://sa0okm9ijn.github.io/')
+```
+
+## csv模块
+
+
+CSV 文件读写
+
+* **csv.reader()**
+
+返回一个reader对象，该对象将遍历给定csvfile中的行
+
+```
+with open('to_addrs.csv','r',encoding='utf-8') as f:
+    reader=csv.reader(f)
+    to_addrs=[]
+    for row in reader:
+        to_addr=row[1]
+```
+
+* **csv.writer()**
+
+返回一个writer对象
+
+```
+import csv
+
+data=[['葛学荣','xuerongge@mdtit.com'],['110来了','454363446@qq.com']]
+
+with open('to_addrs.csv','w',newline='',encoding='utf-8') as f:
+    writer=csv.writer(f)
+    for row in data:
+        writer.writerow(row)
+```
