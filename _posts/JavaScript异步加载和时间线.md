@@ -2,7 +2,7 @@
 title: JavaScript异步加载和时间线
 date: 2019-06-01 13:43:40
 tags: 
-- JavaSript
+- JavaScript
 categries: JavaScript
 description: 
 ---

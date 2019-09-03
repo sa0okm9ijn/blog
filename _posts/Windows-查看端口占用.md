@@ -2,8 +2,8 @@
 title: Windows-查看端口占用
 date: 2019-05-29 14:03:17
 tags:
-- cmd 
-categories: cmd
+- Cmd
+categories: Cmd
 description: 
 ---
 windows下netstat 查看哪个端口被占用以及为哪个进程所占用，使用方法如下：

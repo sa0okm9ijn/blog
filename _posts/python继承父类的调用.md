@@ -2,8 +2,8 @@
 title: python继承父类的调用
 date: 2019-05-29 13:50:24
 tags: 
-- python  
-categories: python  
+- Python  
+categories: Python  
 description: 
 ---
 python中的一个派生类集成多个基类时候。实例化派生类对象后调用方法。如下代码

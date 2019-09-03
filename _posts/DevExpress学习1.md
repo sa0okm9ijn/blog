@@ -3,7 +3,7 @@ title: DevExpress学习
 date: 2019-05-29 09:31:58
 tags: 
 - DevExpress 
-categories: DevExpress 
+categories: .NET
 description: 
 ---
 为了程序的美观设计,决定用dev控件。

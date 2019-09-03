@@ -2,8 +2,8 @@
 title: python模块大全
 date: 2019-07-25 10:35:54
 tags: 
-- python
-categories: python
+- Python模块大全
+categories: Python
 description: python内置模块以及第三方模块用法，持续更新。。。
 ---
 

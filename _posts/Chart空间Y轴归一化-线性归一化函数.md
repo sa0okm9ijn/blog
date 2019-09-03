@@ -3,7 +3,7 @@ title: DevExpress Chart空间Y轴归一化(线性归一化函数)
 date: 2019-05-29 09:29:50
 tags: 
 - DevExpress
-categories: DevExpress 
+categories: .NET
 description: 
 ---
 数据的标准化（normalization）是将数据按比例缩放，使之落入一个小的特定区间。在某些比较和评价的指标处理中经常会用到，去除数据的单位限制，将其转化为无量纲的纯数值，便于不同单位或量级的指标能够进行比较和加权。

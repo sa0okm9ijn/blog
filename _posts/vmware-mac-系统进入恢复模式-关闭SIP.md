@@ -2,8 +2,8 @@
 title: vmware-mac-系统进入恢复模式-关闭SIP
 date: 2019-05-29 14:00:11
 tags: 
-- vmware 
-categories: vmware 
+- Vmware 
+categories: Vmware 
 description: 
 ---
 今天在vmware 15 安装mac10.13，安装之后不能全屏，查了很多资料最后完美解决

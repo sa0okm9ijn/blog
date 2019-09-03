@@ -2,7 +2,7 @@
 title: javascript属性描述符
 date: 2019-07-12 06:33:31
 tags: 
-- JavaSript
+- JavaScript
 categries: JavaScript
 description: 属性描述符（Property Descriptor）是 ES5 之后出现的概念，顾名思义，它用于描述属性应该是什么样，例如是否只读，能否枚举，能否可配置等。所有对象属性均可使用属性描述符来定义。
 ---

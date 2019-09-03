@@ -2,8 +2,8 @@
 title: 4种IO模型介绍
 date: 2019-05-29 09:03:45
 tags: 
-- python  
-categories: python 
+- Python  
+categories: Python  
 description: 
 ---
 # 此处我们以订票为例

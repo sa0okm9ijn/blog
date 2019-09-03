@@ -2,9 +2,9 @@
 title: html和css基础
 date: 2019-06-14 17:57:22
 tags: 
-- css 
-- html 
-categories: css 
+- Css 
+- Html 
+categories: HTML 
 description: html超文本标记语言，层叠样式表 (Cascading Style Sheets，缩写为 CSS），是一种 样式表 语言，用来描述 HTML 或 XML（包括如 SVG、MathML、XHTML 之类的 XML 分支语言）文档的呈现。CSS 描述了在屏幕、纸质、音频等其它媒体上的元素应该如何被渲染的问题。
 ---
 
@@ -452,6 +452,39 @@ figcaption指标题 里面可以放h等标签
 
 
 
+
+## 和picture元素联用
+
+picture通过包含零或多个source元素和一个 img 元素来为不同的显示/设备场景提供图像版本。浏览器会选择最匹配的子 source 元素，如果没有匹配
+
+的，就选择 img 元素的 src 属性中的URL。然后，所选图像呈现在img元素占据的空间中。
+
+```html
+<picture>
+    <source
+        srcset="/some/_1170x658_crop_center-center/man-with-a-dog.webp 1170w,
+                /some/_970x545_crop_center-center/man-with-a-dog.webp 970w,
+                /some/_750x562_crop_center-center/man-with-a-dog.webp 750w,
+                /some/_320x240_crop_center-center/man-with-a-dog.webp 320w"
+        sizes="100vw"
+        type="image/webp"
+    />
+    <source
+        srcset="/some/_1170x658_crop_center-center/man-with-a-dog.jpg 1170w,
+                /some/_970x545_crop_center-center/man-with-a-dog.jpg 970w,
+                /some/_750x562_crop_center-center/man-with-a-dog.jpg 750w,
+                /some/_320x240_crop_center-center/man-with-a-dog.jpg 320w"
+        sizes="100vw"
+    />
+    <img
+        src="/some/man-with-a-dog-placeholder.jpg"
+        alt="Man with a dog"
+        style="object-fit: cover;"
+        loading="lazy"
+    />
+</picture>
+```
+
 # 多媒体元素
 
 video 视频
@@ -613,6 +646,8 @@ CSS规则 = 选择器 + 声明块
 
 # 常见样式声明
 
+## 基本样式
+
 1. color
 
 元素内部的文字颜色
@@ -712,6 +747,63 @@ sans-serif，非衬线字体（每个操作系统都有一个默认的非衬线�
  
 元素内部文字的水平排列方式
 
+## 更多样式
+
+1. 透明度
+
+1. opacity，它设置的是整个元素的透明，它的取值是0 ~ 1
+2. 在颜色位置设置alpha通道(rgba )
+
+2. 鼠标
+
+使用cursor设置
+
+3. 盒子隐藏
+
+1. display:none，不生成盒子
+2. visibility:hidden，生成盒子，只是从视觉上移除盒子，盒子仍然占据空间。
+
+4. 背景图
+
+img元素是属于HTML的概念
+
+背景图属于css的概念
+
+1. 当图片属于网页内容时，必须使用img元素
+2. 当图片仅用于美化页面时，必须使用背景图
+
+
+5. 背景图涉及的css属性
+
+1. background-image
+
+2. background-repeat
+
+默认情况下，背景图会在横坐标和纵坐标中进行重复
+
+3. background-size
+
+预设值：contain、cover，类似于object-fit
+数值或百分比
+
+4. background-position
+
+设置背景图的位置。
+
+预设值：left、bottom、right、top、center
+
+数值或百分比
+
+雪碧图（精灵图）（spirit）
+
+5. background-attachment
+
+通常用它控制背景图是否固定。
+
+6. 背景图和背景颜色混用
+
+7. 速写（简写）background
+
 # 选择器
 
 选择器：帮助你精准的选中想要的元素
@@ -804,6 +896,65 @@ p.red {
 
 
 
+
+## 更多的伪类选择器
+1. :first-child表示一组同级元素中的第一元素
+
+2. :first-of-type表示一组兄弟元素中其类型的第一个元素
+
+``` html
+<article>
+  <div>This `div` is first!</div>
+  <div>This <span>nested `span` is first</span>!</div>
+  <div>This <em>nested `em` is first</em>, but this <em>nested `em` is last</em>!</div>
+  <div>This <span>nested `span` gets styled</span>!</div>
+  <b>This `b` qualifies!</b>
+  <div>This is the final `div`.</div>
+</article>
+
+```
+
+```css
+
+article :first-of-type {
+  background-color: pink;
+}
+```
+此处注意选择器之间的空格，代表的意思是artilce 后代的所有第一个元素背景变色
+
+2. :last-child 表示一组同级元素中的最后一个元素
+
+
+3. :nth-child 匹配基于其一组的兄弟姐妹中位置的元素(计算位置，不考虑匹配元素类型，只看是第几个)
+
+4  :nth-of-type 匹配基于其一组的兄弟姐妹中位置的元素（计算位置，只考虑匹配元素类型）
+
+
+
+odd
+表示在一系列兄弟姐妹中的数字位置为奇数的元素：1,3,5等。
+even
+表示在一系列兄弟姐妹中的数字位置是偶数的元素：2,4,6等。
+
+
+
+>如最初定义的那样，所选元素必须具有父元素。从Selectors Level 4(W3C  选择器标准 第四版--css next)开始，不再需要。
+
+
+
+## 更多的伪元素选择器
+
+1. first-letter
+
+选中元素中的第一个字母
+
+2. first-line
+
+选中元素中第一行的文字
+
+3. selection
+
+选中被用户框选的文字
 
 # 层叠
 
@@ -998,6 +1149,8 @@ span、strong、em、i、img、video、audio
 
 调整行盒的宽高，应该使用字体大小、行高、字体类型，间接调整。
 
+**凡是带有inline的元素，都有文字特性，如元素之间的间隙**
+
 3. 内边距（填充区）
 
 水平方向有效，垂直方向仅会影响背景，垂直方向不会实际占据空间。
@@ -1112,13 +1265,6 @@ padding、宽、margin可以取值为百分比
 1）. 包含块的高度是否取决于子元素的高度，设置百分比无效（包含块没有设置高度，无效）
 2）. 包含块的高度不取决于子元素的高度，百分比相对于父元素高度
 
-4. 上下外边距的合并
-
-两个常规流块盒，上下外边距相邻，会进行合并。
-
-两个外边距取最大值。
-
-
 # 浮动
 
 ## 应用场景
@@ -1147,12 +1293,17 @@ padding、宽、margin可以取值为百分比
 
 ## 盒子排列
 
-1. 左浮动的盒子靠上靠左排列
-2. 右浮动的盒子考上靠右排列
-3. 浮动盒子在包含块中排列时，会避开常规流块盒
-4. 常规流块盒在排列时，无视浮动盒子
-5. 行盒在排列时，会避开浮动盒子
-6. 外边距合并不会发生
+1、浮动元素产生了浮动流
+2、所有产生了浮动流的元素，块级元素看不到他们，
+3、产生了bfc的元素和文本类属性(inline)的元素以及文本都能看到浮动元素
+4、清除浮动流.clear:both  解决父级包住浮动流方法
+5、清除浮动的必须是块级元素，可以通过伪元素来处理 ，可以不改变html结构
+6、浮动最开始用法   图片环绕文字
+
+产生了bfc的元素和文本类属性(inline)的元素都可以解决浮动包裹的问题
+
+但是 position:absoulute float:left/righ元素转换成iniline-block;宽高就由内容决定了。所以设置这些之后宽高取决于内容
+
 > 如果文字没有在行盒中，浏览器会自动生成一个行盒包裹文字，该行盒叫做匿名行盒。
 
 ## 高度坍塌
@@ -1161,210 +1312,107 @@ padding、宽、margin可以取值为百分比
 
 清除浮动，涉及css属性：clear
 
+清除浮动的必须是块级元素，可以通过伪元素来处理 ，可以不改变html结构
+
 - 默认值：none
 - left：清除左浮动，该元素必须出现在前面所有左浮动盒子的下方
 - right：清除右浮动，该元素必须出现在前面所有右浮动盒子的下方
 - both：清除左右浮动，该元素必须出现在前面所有浮动盒子的下方
 
+## 浮动位置
+左浮动的盒子向上向左排列
+
+右浮动的盒子向上向右排列
+
+浮动盒子的顶边不得高于上一个盒子的顶边
+
+若剩余空间无法放下浮动的盒子，则该盒子向下移动，直到具备足够的空间能容纳盒子，然后再向左或向右移动
+
+![](float.gif)
+
+# 定位
+
+定位：手动控制元素在包含块中的精准位置
+
+涉及的CSS属性：position
+
+## position属性
+
+- 默认值：static，静态定位（不定位）
+- relative：相对定位
+- absolute：绝对定位
+- fixed：固定定位
+
+一个元素，只要position的取值不是static，认为该元素是一个定位元素。
+
+定位元素会脱离文档流（相对定位除外）
+
+一个脱离了文档流的元素：
+
+1. 文档流中的元素摆放时，会忽略脱离了文档流的元素
+2. 文档流中元素计算自动高度时，会忽略脱离了文档流的元素
+
+## 相对定位
+
+不会导致元素脱离文档流，只是让元素在原来位置上进行偏移。
+
+可以通过四个CSS属性对设置其位置：
+
+- left
+- right
+- top
+- bottom
+
+盒子的偏移不会对其他盒子造成任何影响。
+
+## 绝对定位
+
+1. 宽高为auto，适应内容
+2. 包含块变化：找祖先中第一个定位元素，**该元素的填充盒为其包含块**。若找不到，则它的包含块为**整个网页**（初始化包含块）
+3. 脱离原来定位 相对于最近的父级有定位的元素进行定位，如果没有，那么由文档进行定位
+
+## 固定定位
+
+其他情况和绝对定位完全一样。
+
+包含块不同：**固定为视口**（浏览器的可视窗口）
+
+## 定位下的居中
+
+某个方向居中：
+
+1. 定宽（高）
+2. 将左右（上下）距离设置为0
+3. 将左右（上下）margin设置为auto
+
+绝对定位和固定定位中，margin为auto时，会自动吸收剩余空间
+
+## 多个定位元素重叠时
+
+堆叠上下文
+
+设置z-index，通常情况下，该值越大，越靠近用户
+
+只有定位元素设置z-index有效
+
+z-index可以是负数，如果是负数，则遇到常规流、浮动元素，则会被其覆盖
+
+## 补充
+
+- 绝对定位、固定定位元素一定是块盒
+- 绝对定位、固定定位元素一定不是浮动
+- 没有外边距合并
 
 
-## 简单示例2
-
-```
-border 画三角
-```
 
 
-## 文本类
+# 两个经典bug
 
-* 垂直居中
-
-```
-height=line-height
-```
-
-* 首行缩进
-
-```
-text-indent:2px;
-```
-
-## 单位em
-
-```
-1em=1font-size(指的高);
-```
-
-## html中元素分类
-
-* 行级元素
-
-内容决定所占位置，不可以通过css改变宽高，如span、strong、em、a、del,display:inline为行级元素
-
-* 块级元素
-
-独占一行，可以通过css改变宽高，如div、p、ul、li、ol、form、address,display:block为块级元素
-
-* 行级块元素
-
-内容决定大小，可以改变宽高，display:inline-block为行级块元素
-
-**凡是带有inline的元素，都有文字特性，如元素之间的间隙**
-
-
-## html中的模型
-
-
-* 层模型
-
-1.position:absolute
-
-脱离原来定位 相对于最近的父级有定位的元素进行定位，如果没有，那么由文档进行定位
-
-2.position:relative
-
-保留原来的位置进行定位，相对于自己原来的位置定位
-
-3.position:fixed
-
-
-* 浮动模型
-
-float:  left/right
-
-可以让元素向左或向右排成一行显示，换行依据为父元素的宽度
-
-```
-<style>
-    .wrapper {
-        width: 300px;
-        height: 300px;
-        border: solid 1px red;
-    }
-
-    .content {
-        /**从左开始战队，换行依据为父元素的宽度**/
-        float: left; 
-        width: 100px;
-        height: 100px;
-        color: #fff;
-        background-color: black;
-    }
-</style>
-
-
-<div class="wrapper">
-    <div class="content">123</div>
-    <div class="content">123</div>
-    <div class="content">132</div>
-</div>
-```
-### 浮动元素特点
-1、浮动元素产生了浮动流
-2、所有产生了浮动流的元素，块级元素看不到他们，
-3、产生了bfc的元素和文本类属性(inline)的元素以及文本都能看到浮动元素
-4、清除浮动流.clear:both  解决父级包住浮动流方法
-5、清除浮动的必须是块级元素，可以通过伪元素来处理 ，可以不改变html结构
-6、浮动最开始用法   图片环绕文字
-
-此处box产生了浮动流，后面的块级元素看不到他就会占据box的位置
-```
-.box{
-    float: left;
-    width: 100px;
-    height: 100px;
-    background-color:black;
-    opacity: 0.5;
-
-}
-.demo{
-    width: 150px;
-    height: 150px;
-    background-color: green;
-
-}
-<div class="box"></div>
-<div class="demo"></div>
-```
-
-清除浮动解决父级元素包裹不住子元素的问题
-```
-<style>
-    .wrapper {
-        border: solid 1px red;
-    }
-
-    .content {
-        /**块级元素看不到浮动元素，所以父级就包不住conten了，**/
-        float: left;
-        width: 100px;
-        height: 100px;
-        color: #fff;
-        background-color: black;
-    }
-    p{
-        border-top: 0px solid green;  
-        clear: both;    
-    
-    }
-</style>
-
-<div class="wrapper">
-    <div class="content">123</div>
-    <div class="content">123</div>
-    <div class="content">132</div>
-    <p></p>
-</div>
-```
-
-利用伪元素来清除浮动
-
-
-```
-.wrapper {
-  border: solid 1px red;
-}
-
-.content {
-  /**块级元素看不到浮动元素，所以父级就包不住conten了，**/
-  float: left;
-  width: 100px;
-  height: 100px;
-  color: #fff;
-  background-color: black;
-}
-.wrapper::after{
-  content: "";
-  clear: both;
-  display: block;
-}
-
-<div class="wrapper">
-    <div class="content">123</div>
-    <div class="content">123</div>
-    <div class="content">132</div>
-</div>
-
-```
-
-产生了bfc的元素和文本类属性(inline)的元素都可以解决浮动包裹的问题。但是position:absoulute float:left/righ元素转换成iniline-block;宽高就由内容决定了。所以设置这些之后宽高取决于内容
-
-## 触发bfc(bfc block format context)
-
-正常盒子都一个规则，触发bfc 规则失效,遵循另一套规则
-
-1、position:absolute
-2、display:inline-block
-3、float
-4、overflow:hidden
-
-## 2个bug
-
-1、margin塌陷
+## margin塌陷
 
 父子标签，垂直方向的margin 粘合在一起取 取最大的margin定位
 
-```
+```html
 <style>
     .wrapper{
         margin-left: 100px;
@@ -1385,8 +1433,9 @@ float:  left/right
     <div class="content"></div>
 </div>
 ```
-父级触发bfc拉解决此问题
-2、margin合并
+**父级触发bfc拉解决此问题**
+
+## margin合并
 
 兄弟结构，垂直方向margin合并
 
@@ -1422,118 +1471,869 @@ float:  left/right
 <div class="demo1">123</div>
 <div class="demo2">456</div>
 ```
+**可以通过把需要解决的元素放到bfc的元素中，来解决此问题，但是这样就会改变了html结构，所以不解决，可以通过数学方法设置合适的像素。**
 
-也可以通过把需要解决的元素放到bfc的元素中，来解决此问题，但是这样就会改变了html结构，所以不解决，可以通过数学方法设置合适的像素。
+# BFC
 
-## 简单示例3
+> 官方解释,块格式化上下文（Block Formatting Context，BFC）,它是一块独立的渲染区域，它规定了在该区域中，常规流块盒的布局
+
+常规流块盒布局
+
+1. 常规流块盒在水平方向上，必须撑满包含块
+
+2. 常规流块盒在包含块的垂直方向上依次摆放
+
+3. 常规流块盒若外边距无缝相邻，则进行外边距合并
+
+4. 常规流块盒的自动高度和摆放位置，无视浮动元素
+
+渲染区域
+
+1. 根元素
+
+2. 浮动和绝对定位元素
+
+3. overflow不等于visible的块盒
+
+独立的
+
+1. 不同的BFC区域，它们进行渲染时互不干扰
+
+2. 创建BFC的元素，隔绝了它内部和外部的联系，内部的渲染不会影响到外部
+
+具体规则
+
+创建BFC的元素，它的自动高度需要计算浮动元素(类似清除浮动的效果)
+
+创建BFC的元素，它的边框盒不会与浮动元素重叠(会避开浮动盒子)
+
+创建BFC的元素，不会和它的子元素进行外边距合并()
+
+
+
+# iframe元素
+
+框架页
+
+通常用于在网页中嵌入另一个页面
+
+iframe 可替换元素
+
+1. 通常行盒
+2. 通常显示的内容取决于元素的属性
+3. CSS不能完全控制其中的样式
+4. 具有行快盒的特点
+
+
+
+# 在页面中使用flash
+
+object
+
+embed
+
+它们都是可替换元素
+
+MIME(Multipurpose Internet Mail Extensions)
+
+多用途互联网邮件类型：
+
+比如，资源是一个jpg图片，MIME：image/jpeg
+
+```html
+<!-- 兼容的写法 -->
+<object data="./example.swf" type="application/x-shockwave-flash">
+    <param name="quality" value="high">
+    <embed quality="high" src="./example.swf" type="application/x-shockwave-flash">
+</object>
+```
+
+
+
+
+
+# 表单元素
+
+一系列元素，主要用于收集用户数据
+
+## input元素
+
+输入框
+
+- type属性：输入框类型
+
+type: text， 普通文本输入框
+type：password，密码框
+type: date, 日期选择框，兼容性问题
+type: search, 搜索框，兼容性问题
+type: number，数字输入框
+type: checkbox，多选框
+type: radio，单选框
+
+- value属性：输入框的值
+- placeholder属性：显示提示的文本，文本框没有内容时显示
+
+
+input元素可以制作按钮
+
+当type值为reset、button、submit时，input表示按钮。
+
+## select元素
+
+下拉列表选择框
+
+通常和option元素配合使用
+
+## textarea元素
+
+文本域，多行文本框
+
+## 按钮元素
+
+button
+
+type属性：reset、submit、button，默认值submit
+
+## 表单状态
+
+readonly属性：布尔属性，是否只读，不会改变表单显示样式
+
+disabled属性：布尔属性，是否禁用，会改变表单显示样式
+
+
+## 配合表单元素的其他元素
+
+### label
+
+普通元素，通常配合单选和多选框使用
+
+- 显示关联
+
+可以通过for属性，让label元素关联某一个表单元素，for属性书写表单元素id的值
+
+```html
+<input id='radMale' type='radio' />
+<label for='radMale'>男</lable>  //这样在点击男的时候也会有radio的效果了
+```
+
+- 隐式关联
+
+```html
+<label>
+   <input type='radio'/>
+   男
+</label>
 
 ```
-五环   经典 2栏布局
+
+### datalist
+
+数据列表
+
+该元素本身不会显示到页面，通常用于和普通文本框配合
+
+
+```html
+<p>
+    请输入你常用的浏览器：
+    <input list="userAgent" type="text">
+</p>
+
+<datalist id="userAgent">
+    <option value="Chrome">谷歌浏览器</option>
+    <option value="IE">IE浏览器</option>
+    <option value="Opera">欧鹏浏览器</option>
+    <option value="Safari">苹果浏览器</option>
+    <option value="Fire fox">火狐浏览器</option>
+</datalist>
 ```
 
+### form元素
 
+通常，会将整个表单元素，放置form元素的内部，作用是当提交表单时，会将form元素内部的表单内容以合适的方式提交到服务器。
 
-## 文本类 
+form元素对开发静态页面没有什么意义。
 
-1、溢出文字打点处理
+### fieldset元素
 
-```
-//单行文本
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
-```
+表单分组
 
+``` html
+<h1>修改用户信息</h1>
+<fieldset>
+    <legend>账号信息</legend>
+    <p>
+        用户账号：
+        <input type="text" value="aaaaa" readonly>
+    </p>
+    <p>
+        用户密码：
+        <input type="password">
+    </p>
+</fieldset>
 
-## 2个规则
-
-p不能套div
-a不能套a
-
-## 网页设计没有css解决图片该汉字显示的问题
-
-第一种方法
-text-indent:200px;
-white-space:nowrap;
-overflow:hidden;
-
-第二种方法
-heigth:0;
-paddint-top:
-overflow:hidden;
-、
-
-
-
-
-
-
-
-
-
-
-
-## :hover伪类
-:hover可以任何伪元素上使用。在触摸屏上 :hover 有问题，基本不可用。不同的浏览器上:hover 伪类表现不同。 可能从不会触发；或者在触摸某元素后触发了一小会儿；或者总是触发即使用户不在触摸了，直到用户触摸别的元素。 触摸屏非常普遍，所以网页开发人员不要让任何内容只能通过悬停才能展示出来，不然这些内容对于触摸屏使用者来说很难或者说不可能看到。
-
-## 语法
-
-```
-:hover
+<fieldset>
+    <legend>基本信息</legend>
+    <p>
+        用户姓名：
+        <input disabled value="袁进" type="text">
+    </p>
+    <p>
+        城市：
+        <select disabled name="" id="">
+            <option value="">Lorem.</option>
+            <option value="">Vel!</option>
+            <option value="">Dolore?</option>
+            <option value="">Autem?</option>
+            <option value="">Nulla?</option>
+            <option value="">Aliquam?</option>
+            <option value="">Obcaecati!</option>
+            <option value="">Nulla!</option>
+            <option value="">Totam.</option>
+            <option value="">Ipsum.</option>
+        </select>
+    </p>
+</fieldset>
 ```
 
-## 示例
+# 美化表单元素
+
+## 新的伪类
+
+1. focus
+
+元素聚焦时的样式
+
+```css
+input:focus {
+    outline: 1px solid #008c8c;
+    outline-offset: 0;
+    color: #000;
+}   
+```
+
+2. checked
+
+单选或多选框被选中的样式
+
+```css
+input:checked+label {
+    color: red;
+}
+```
+
+## 常见用法
+
+1. 重置表单元素样式
+
+2. 设置textarea是否允许调整尺寸
+
+css属性resize：
+
+- both：默认值，两个方向都可以调整尺寸
+- none：不能调整尺寸
+- horizontal: 水平方向可以调整尺寸
+- vertical：垂直方向可以调整尺寸
+
+3. 文本框边缘到内容的距离
+
+4. 控制单选和多选的样式
+
+```html
+<style>
+    .radio-item .radio {
+        width: 12px;
+        height: 12px;
+        border: 1px solid #999;
+        border-radius: 50%;
+        cursor: pointer;
+        display: inline-block;
+    }
+
+    .radio-item input:checked+.radio{
+        border-color: #008c8c;
+    }
+
+    .radio-item input:checked~span{
+        color:#008c8c;
+    }
+
+    .radio-item input:checked+.radio::after {
+        content: "";
+        display: block;
+        width: 5px;
+        height: 5px;
+        background: #008c8c;
+        margin-left: 3.5px;
+        margin-top: 3.5px;
+        border-radius: 50%;
+    }
+
+    .radio-item input[type="radio"]{
+        display: none;
+    }
+</style>
+
+
+<p>
+    请选择性别：
+<label class="radio-item">
+    <input name="gender" type="radio">
+    <span class="radio"></span>
+    <span>男</span>
+</label>
+
+<label class="radio-item">
+    <input name="gender" type="radio">
+    <span class="radio"></span>
+    <span>女</span>
+</label>
+</p>
+```
+
+# 表格元素
+
+在css技术出现之前，网页通常使用表格布局。
+
+后台管理系统中可能会使用表格。
+
+前台：面向用户
+
+后台：面向管理员。对界面要求不高，对功能性要求高。
+
+表格不再适用于网页布局？表格的渲染速度过慢。
+
+# 其他元素
+
+1. abbr
+
+缩写词
+
+```html
+<p>
+    <abbr title="cascading style sheet">CSS</abbr> 是用于为页面添加样式
+</p>
+```
+
+2. time
+
+提供给浏览器或搜索引擎阅读的时间
+
+```html
+<p>
+    <time datetime="2019-5-1">今年5月</time>  我录制了HTML 和 CSS的课程
+</p>
+```
+
+3. b  （bold）
+
+以前是一个无语义元素，主要用于加粗字体
+
+4. q
+
+一小段引用文本
+
+5. blockquote
+
+大段引用的文本
+
+6. br
+
+无语义
+主要用于在文本中换行
+
+7. hr
+
+无语义
+主要用于分割
+
+8. meta
+
+还可以用于搜索引擎优化（SEO）
+
+9.  link
+
+链接外部资源（CSS、图标）
+
+rel属性：relation，链接的资源和当前网页的关系
+
+type属性：链接的资源的MIME类型
+
+设置网站的图片,如下设置或者放到网站根目录
 
 ```
-:link:hover { outline: dotted red; }
-
-.foo:hover { background: gold; }
-
+<link rel='shortcut icon' type='image/x-icon' href='123.ico' />
 ```
 
-### 下拉按钮
+# @规则
 
-使用:hover 伪类可以创建复杂的层叠机制。一个常见用途，比如，创建一个纯CSS的下拉按钮（不使用JavaScript）。 本质是创建如下的CSS：
+at-rule: @规则、@语句、CSS语句、CSS指令
 
-```
-div.menu-bar ul ul {
-  display: none;
+1. import
+
+@import "路径";
+
+导入另外一个css文件
+
+2. charset
+
+@charset "utf-8";
+
+告诉浏览器该CSS文件，使用的字符编码集是utf-8，必须写到第一行
+
+
+# web字体和图标
+
+## web字体
+
+用户电脑上没有安装相应字体，强制让用户下载该字体，临时安装
+
+使用@font-face指令制作一个新字体
+
+```css
+/* 制作一个新的字体，名称叫做good night */
+@font-face {
+    font-family: "good night";
+    src: url("./font/晚安体.ttf");
 }
 
-div.menu-bar li:hover > ul {
-  display: block;
+p {
+    font-family: "good night";
 }
 
-```
-
-HTML内容如下
+/* 字体文件过大，可能会影响性能 */
 
 ```
-<div class="menu-bar">
-  <ul>
-    <li>
-      <a href="example.html">Menu</a>
-      <ul>
-        <li>
-          <a href="example.html">Link</a>
-        </li>
-        <li>
-          <a class="menu-nav" href="example.html">Submenu</a>
-          <ul>
-            <li>
-              <a class="menu-nav" href="example.html">Submenu</a>
-              <ul>
-                <li><a href="example.html">Link</a></li>
-                <li><a href="example.html">Link</a></li>
-                <li><a href="example.html">Link</a></li>
-                <li><a href="example.html">Link</a></li>
-              </ul>
-            </li>
-            <li><a href="example.html">Link</a></li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-  </ul>
-</div>
+
+## 字体图标
+
+利用了web字体特性，把字体设置成了各种图标
+
+做的比较好的,阿里的iconfont.cn
+
+这里生成的字体，只考虑我们用到的图标的字体，所以性能可以忽略。
+
+1. 在线方式
+
+```css
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1206816_qshsac4925m.css">
 ```
+
+2. 离线方式
+
+3. unicode
+
+```css
+<style>
+    @font-face {
+        font-family: 'iconfont';
+        /* project id 1206816 */
+        src: url('//at.alicdn.com/t/font_1206816_qshsac4925m.eot');
+        src: url('//at.alicdn.com/t/font_1206816_qshsac4925m.eot?#iefix') format('embedded-opentype'),
+            url('//at.alicdn.com/t/font_1206816_qshsac4925m.woff2') format('woff2'),
+            url('//at.alicdn.com/t/font_1206816_qshsac4925m.woff') format('woff'),
+            url('//at.alicdn.com/t/font_1206816_qshsac4925m.ttf') format('truetype'),
+            url('//at.alicdn.com/t/font_1206816_qshsac4925m.svg#iconfont') format('svg');
+    }
+
+    .iconfont {
+        font-family: "iconfont";
+        font-style: normal;
+    }
+</style>
+
+<p>
+    <i class="iconfont">
+        &#xe62e;
+    </i>
+</p>
+```
+
+# 布局
+
+## 多栏布局
+
+两栏布局
+
+左栏浮动，主区域overflow:hiddne，间距通过左栏的margin-right
+
+三栏布局
+
+侧边栏左浮动，右浮动，主区域overflow:hidden,间距通过侧边栏的margin
+
+## 等高
+
+1. CSS3的弹性盒
+2. JS控制
+3. 伪等高
+
+## 元素书写顺序
+
+## 后台页面的布局
+
+主区域固定定位，宽高100%。
+
+# 行高的取值
+
+line-height
+
+1. px, 像素值
+
+2. 无单位的数字(多行文本通常采用这个)
+
+行高为字体大小的两倍 
+
+先继承，再计算 
+
+3. em单位
+
+行高为字体大小的两倍 
+
+先计算像素值，再继承 
+
+4. 百分比
+
+# body背景
+
+**画布 canvas**
+
+一块区域
+
+特点：
+
+1. 最小宽度为视口宽度
+2. 最小高度为视口高度
+
+**HTML元素的背景**
+
+覆盖画布
+
+**BODY元素的背景**
+
+如果HTML元素有背景，BODY元素正常（背景覆盖边框盒）
+
+如果HTML元素没有背景，BODY元素的背景覆盖画布
+
+**关于画布背景图**
+
+1. 背景图的宽度百分比，相对于视口
+2. 背景图的高度百分比，相对于网页高度
+3. 背景图的横向位置百分比、预设值，相对于视口
+4. 背景图的纵向位置百分比、预设值，相对于网页高度
+
+
+# 行盒的垂直对齐
+
+## 多个行盒垂直方向上的对齐
+
+给没有对齐元素设置vertical-align
+
+预设值
+
+数值
+
+## 图片的底部白边
+
+图片的父元素是一个块盒，块盒高度自动，图片底部和父元素底边之间往往会出现空白。
+
+1. 设置父元素的字体大小为0
+2. 将图片设置为块盒
+
+# 堆叠上下文
+
+堆叠上下文（stack context），它是一块区域，这块区域由某个元素创建，它规定了该区域中的内容在Z轴上排列的先后顺序。
+
+## 创建堆叠上下文的元素
+
+1. html元素（根元素）
+2. 设置了z-index（非auto）数值的定位元素
+
+## 同一个堆叠上下文中元素在Z轴上的排列
+
+从后到前的排列顺序：
+
+1. 创建堆叠上下文的元素的背景和边框
+
+2. 堆叠级别(z-index, stack level)为负值的堆叠上下文
+3. 常规流非定位的块盒
+4. 非定位的浮动盒子
+5. 常规流非定位行盒
+6. 任何 z-index 是 auto 的定位子元素，以及 z-index 是 0 的堆叠上下文
+7. 堆叠级别为正值的堆叠上下文
+
+每个堆叠上下文，独立于其他堆叠上下文，它们之间不能相互穿插。
+
+
+# svg
+
+svg: scalable vector graphics，可缩放的矢量图
+
+1. 该图片使用代码书写而成
+2. 缩放不会失真
+3. 内容轻量
+
+## 怎么使用
+
+svg可以嵌入浏览器，也可以单独成为一个文件
+
+xml语言，svg使用该语言定义
+
+## 书写svg代码
+
+### 矩形:rect
+
+### 圆形：circle
+
+### 椭圆：ellipse
+
+### 线条：line
+
+### 折线：polyline
+
+### 多边形：polygon
+
+### 路径：path
+
+M = moveto
+L = lineto
+H = horizontal lineto
+V = vertical lineto
+C = curveto
+S = smooth curveto
+Q = quadratic Belzier curve
+T = smooth quadratic Belzier curveto
+A = elliptical Arc
+Z = closepath
+
+A
+半径1    
+半径2     
+顺时针旋转角度    
+小弧（0）或大弧（1）   
+顺时针（1）逆时针（0）
+
+### 例子
+
+画太极图
+
+# 数据链接
+
+data url
+
+## 如何书写
+
+数据链接：将目标文件的数据直接书写到路径位置
+
+语法：data:MIME,数据
+
+## 意义
+
+优点：
+
+1. 减少了浏览器中的请求
+
+请求
+
+响应
+
+减少了请求中浪费的时间
+
+2. 有利于动态生成数据
+
+缺点：
+
+1. 增加了资源的体积
+
+导致了传输内容增加，从而增加了单个资源的传输时间
+
+2. 不利于浏览器的缓存
+
+浏览器通常会缓存图片文件、css文件、js文件。
+
+3. 会增加原资源的体积到原来的4/3
+
+应用场景：
+
+1. 但请求单个图片体积较小，并且该图片因为各种原因，不适合制作雪碧图，可以使用数据链接。
+
+2. 图片由其他代码动态生成，并且图片较小，可以使用数据链接。
+
+## base64
+
+一种编码方式
+
+通常用于将一些二进制数据，用一个可书写的字符串表示。
+
+
+# 浏览器兼容性
+
+## 问题产生原因
+
+- 市场竞争
+- 标准版本的变化
+
+## 厂商前缀
+
+> 比如：box-sizing， 谷歌旧版本浏览器中使用-webkit-box-sizing:border-box
+
+- 市场竞争，标准没有发布
+- 标准仍在讨论中（草案），浏览器厂商希望先支持
+
+IE： -ms-
+Chrome，safari:  -webkit-
+opera： -o-
+firefox: -moz-
+
+> 浏览器在处理样式或元素时，使用如下的方式：
+> 当遇到无法识别的代码时，直接略过。
+
+
+1. 谷歌浏览器的滚动条样式
+
+实际上，在开发中使用自定义的滚动条，往往是使用div+css+JS实现的
+
+2. 多个背景图中选一个作为背景
+
+## css hack
+
+根据不同的浏览器（主要针对IE），设置不同的样式和元素
+
+1. 样式
+
+IE中，CSS的特殊符号
+
+- *属性，兼容IE5、IE6、IE7
+- _属性，兼容IE5~IE6
+- 属性值\9，兼容IE5~IE11
+- 属性值\0，兼容IE8~IE11
+- 属性值\9\0，兼容IE9~IE10
+
+> IE5、6、7的外边距bug，浮动元素的左外边距翻倍
+
+2. 条件判断
+
+## 渐近增强 和 优雅降级
+
+两种解决兼容性问题的思路，会影响代码的书写风格
+
+- 渐近增强：先适应大部分浏览器，然后针对新版本浏览器加入新的样式
+
+书写代码时，先尽量避免书写有兼容性问题的代码，完成之后，再逐步加入新标准中的代码。
+
+- 优雅降级：先制作完整的功能，然后针对低版本浏览器进行特殊处理
+
+书写代码时，先不用特别在意兼容性，完成整个功能之后，再针对低版本浏览器处理样式。
+
+## caniuse
+
+查找css兼容性
+
+[caniuse.com](https://caniuse.com/)
+
+
+# 居中总结
+
+居中：盒子在其包含块中居中
+
+## 行盒（行块盒）水平居中
+
+直接设置行盒（行块盒）父元素text-align:center
+
+## 常规流块盒水平居中
+
+定宽，设置左右margin为auto
+
+## 绝对定位元素的水平居中
+
+定宽，设置左右的坐标为0（left:0, right:0），将左右margin设置为auto
+
+> 实际上，固定定位（fixed）是绝对定位（absolute）的特殊情况
+
+## 单行文本的垂直居中
+
+设置文本所在元素的行高，为整个区域的高度
+
+## 行块盒或块盒内多行文本的垂直居中
+
+没有完美方案
+
+设置盒子上下内边距相同，达到类似的效果。
+
+## 绝对定位的垂直居中
+
+定高，设置上下的坐标为0（top:0, bottom:0），将上下margin设置为auto
+
+
+# 样式补充
+
+## display:list-item
+
+设置为该属性值的盒子，本质上仍然是一个块盒，但同时该盒子会附带另一个盒子
+
+元素本身生成的盒子叫做主盒子，附带的盒子称为次盒子，次盒子和主盒子水平排列
+
+涉及的css：
+
+1. list-style-type
+
+设置次盒子中内容的类型
+
+2. list-style-position
+
+设置次盒子相对于主盒子的位置
+
+3. 速写属性list-style
+
+**清空次盒子**
+
+list-style:none
+
+## 图片失效时的宽高问题
+
+如果img元素的图片链接无效，img元素的特性和普通行盒一样，无法设置宽高
+
+## 行盒中包含行块盒或可替换元素
+
+行盒的高度与它内部的行块盒或可替换元素的0高度无关
+
+## text-align:justify
+
+text-align:
+
+- left: 左对齐
+- right：右对齐
+- center：居中
+- justify：除最后一行外(添加空的伪元素,设置为行块盒)，分散对齐
+
+## 制作一个三角形
+
+```
+div{
+    width: 0;
+    height: 0;
+    border: 10px solid transparent;
+    border-left-color: red;
+}
+```
+
+## direction 和 writing-mode
+
+开始 start -> 结束 end
+左 left -> 右 end
+
+开始和结束是相对的，不同国家有不同的习惯
+
+左右是绝对的
+
+direction设置的是开始到结束的方向
+
+writing-mode：设置文字书写方向
+
+## utf-8字符
+
+css中 "\59EC\6210";
+
+网页中通过 &#x8881;&#x8FDB;
+
+
+

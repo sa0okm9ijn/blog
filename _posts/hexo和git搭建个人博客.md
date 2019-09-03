@@ -2,9 +2,9 @@
 title: hexo和git搭建个人博客
 date: 2019-07-24 14:26:48
 tags: 
-- hexo
-- git
-categories: git 
+- Hexo
+- Git
+categories: Git 
 description: 
 ---
 ## 什么是hexo

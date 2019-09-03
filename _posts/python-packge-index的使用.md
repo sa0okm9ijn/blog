@@ -2,8 +2,8 @@
 title: python-packge-index的使用
 date: 2019-05-29 13:18:31
 tags: 
-- python 
-categories: python  
+- Python 
+categories: Python 
 description: 
 ---
 python packge index（PyPI）是Python编程语言的软件存储库。可用下载各种常用库，以及自己制作并上传库

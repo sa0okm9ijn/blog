@@ -2,8 +2,8 @@
 title: VisualStudio2017离线安装
 date: 2019-05-29 13:52:13
 tags: 
-- visualstudio2017 
-categories: visualstudio2017 
+- VisualStudio2017 
+categories: VisualStudio2017 
 description: 
 ---
 

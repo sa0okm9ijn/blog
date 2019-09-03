@@ -3,9 +3,9 @@ layout: wpf系列1之术语解释
 title: wpf系列1之术语解释
 date: 2019-07-24 16:03:08
 tags: 
-- wpf
-- c#
-categories: wpf
+- Wpf
+- C#
+categories: Wpf
 description: 
 ---
 

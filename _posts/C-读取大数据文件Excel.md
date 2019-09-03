@@ -2,10 +2,8 @@
 title: 'C#读取大数据文件Excel'
 date: 2019-05-30 10:06:07
 tags: 
-- C# 
-- 大数据
-- Open XML SDK
-categories: C#
+- C#
+categories: .NET
 description: Open XML SDK 提供两种分析 Open XML 文件的方法。 可以使用 SDK 文档对象模型 (DOM) 或 Simple API for XML (SAX) 读取和写入功能。 SDK DOM 设计为使您可以使用强类型类轻松查询和分析 Open XML 文件。 但是，DOM 方法需要将整个 Open XML 部件加载到内存中，这在处理较大文件时会引发内存不足异常。 使用 SAX 方法，可以通过 OpenXMLReader 一次一个元素地读取文件中的 XML，而无需将整个文件加载到内存中。 当需要处理非常大的文件时，可考虑使用 SAX。
 ---
 

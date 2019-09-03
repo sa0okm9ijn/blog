@@ -2,8 +2,8 @@
 title: linux命令篇
 date: 2019-07-17 09:32:17
 tags: 
-- linux  
-categories: linux  
+- Linux  
+categories: Linux  
 description: 
 ---
 
