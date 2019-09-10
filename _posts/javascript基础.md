@@ -206,7 +206,9 @@ prompt('请输入你的年龄')
 - true，表示真
 - false，表示假
 
-4. undefined类型
+即除 false、0、""、null、undefined 和 NaN 以外皆为真值
+
+1. undefined类型
 
 表示未定义，不存在。
 

@@ -317,7 +317,7 @@ print(set(list2))  # 去重，删去了重复的“1”。
 
 ### 列表生成式
 
-```
+```python 
 list1 = [i for i in range(3)]  # 规定列表中元素的范围
 print(list1)
 
@@ -335,7 +335,7 @@ print(list3)
 
 普通方法生成上面列表
 
-```
+```python
 list1 = []
 for i in range(3):
     list1.append(i)
@@ -353,6 +353,23 @@ for i in range(1,11):
         list3.append(i*i)
 print(list3)
 ```
+
+1. 扩展
+
+有列表[0，1，2，3，4，5，6，7，8，9]，要求把列表里面的每个值加1
+
+```python
+info = [0,1,2,3,4,5,6,7,8,9]
+b = []
+for index,i in  enumerate(info):
+    print(i+1)
+    b.append(i+1)
+print(b)
+```
+#enumerate()函数用于将一个可遍历的数据对象(如列表、元组或字符串)组合为一个索引序列，同时列出数据和数据下标，一般用在for循环当中。
+
+
+
 
 
 ## 知识二:字典
@@ -407,6 +424,25 @@ for k,v in DictName.items():
 
 ```
 for value in DictName.values(): print(value)  # value的名字可以自行另取 # DictName是要遍历的字典的名称 # .values():是固定的用法
+```
+
+# 生成器
+
+## 什么是生成器
+
+>通过列表生成式，我们可以直接创建一个列表，但是，受到内存限制，列表容量肯定是有限的，而且创建一个包含100万个元素的列表，不仅占用很大的存储空间，如果我们仅仅需要访问前面几个元素，那后面绝大多数元素占用的空间都白白浪费了。
+
+>所以，如果列表元素可以按照某种算法推算出来，那我们是否可以在循环的过程中不断推算出后续的元素呢？这样就不必创建完整的list，从而节省大量的空间，在Python中，这种一边循环一边计算的机制，称为生成器：generator
+
+
+创建生成器,只要把一个列表生成式的[]中括号改为（）小括号，就创建一个generator
+```python
+generator_ex = (x*x for x in range(10))
+print(generator_ex)
+
+结果：
+[0,1,4,9,16,25,36,49,64,81]
+<generatorobject<genexpr>at0x000002A4CBF9EBA0>
 ```
 
 # for循环和while循环
