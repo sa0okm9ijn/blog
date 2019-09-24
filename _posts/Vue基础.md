@@ -504,9 +504,9 @@ Mustache 语法不能作用在 HTML 特性上，遇到这种情况应该使用 v
 
 ```
 
-## 计算属性和侦听器
+# 计算属性和侦听器
 
-### 基础例子
+## 基础例子
 
 模板内的表达式非常便利，但是设计它们的初衷是用于简单运算的。在模板中放入太多的逻辑会让模板过重且难以维护。例如：
 
@@ -544,7 +544,7 @@ Mustache 语法不能作用在 HTML 特性上，遇到这种情况应该使用 v
 
 你可以像绑定普通属性一样在模板中绑定计算属性。Vue 知道 vm.reversedMessage 依赖于 vm.message，因此当 vm.message 发生改变时，所有依赖 vm.reversedMessage 的绑定也会更新。
 
-### 计算属性vs方法
+## 计算属性vs方法
 
 ```javascript
 
@@ -583,7 +583,7 @@ Mustache 语法不能作用在 HTML 特性上，遇到这种情况应该使用 v
 >计算属性reversedMessage依赖message的改变，才会调用，对计算结果进行了缓存
 
 
-### 计算属性vs侦听属性
+## 计算属性vs侦听属性
 
 Vue 提供了一种更通用的方式来观察和响应 Vue 实例上的数据变动：侦听属性。当你有一些数据需要随着其它数据变动而变动时，你很容易滥用 watch
 
@@ -630,7 +630,7 @@ var vm = new Vue({
 
 舒服多了
 
-### 计算属性的setter
+## 计算属性的setter
 
 计算属性默认只有 getter ，不过在需要时你也可以提供一个 setter ：
 
@@ -653,7 +653,7 @@ computed: {
 vm.reversedMessage3='test'时,setter 会被调用
 
 
-### 侦听器
+## 侦听器
 
 虽然计算属性在大多数情况下更合适，但有时也需要一个自定义的侦听器。这就是为什么 Vue 通过 watch 选项提供了一个更通用的方法，来响应数据的变化。当需要在数据变化时执行异步或开销较大的操作时，这个方式是最有用的。
 
@@ -700,11 +700,11 @@ var vm = new Vue({
 
 在这个示例中，使用 watch 选项允许我们执行异步操作 (访问一个 API)，利用函数防抖，最终得到想要的结果
 
-## Class与Style绑定
+# Class与Style绑定
 
 操作元素的 class 列表和内联样式是数据绑定的一个常见需求。因为它们都是属性，所以我们可以用 v-bind 处理它们：只需要通过表达式计算出字符串结果即可。不过，字符串拼接麻烦且易错。因此，在将 v-bind 用于 class 和 style 时，Vue.js 做了专门的增强。表达式结果的类型除了字符串之外，还可以是对象或数组。
 
-### 对象用法
+## 对象用法
 
 我们可以传给 v-bind:class 一个对象，以动态地切换 class：
 
@@ -744,7 +744,7 @@ var vm = new Vue({
 
 ```
 
-### 数组用法
+## 数组用法
 
 我们可以把一个数组传给 v-bind:class，以应用一个 class 列表：
 
@@ -771,7 +771,7 @@ var vm = new Vue({
 
 
 
-### 用在组件上
+## 用在组件上
 
 当在一个自定义组件上使用 class 属性时，这些 class 将被添加到该组件的根元素上面。这个元素上已经存在的 class 不会被覆盖。
 
@@ -788,7 +788,7 @@ Vue.component('my-component', {
 
 ```
 
-### 绑定内联样式
+## 绑定内联样式
 
 1. 对象语法
 
@@ -841,3 +841,203 @@ data: {
 <div :style="{ display: ['-webkit-box', '-ms-flexbox', 'flex'] }"></div>
 
 ```
+
+
+# 条件渲染
+
+## v-if
+
+v-if 指令用于条件性地渲染一块内容。这块内容只会在指令的表达式返回 truthy 值的时候被渲染。
+
+因为 v-if 是一个指令，所以必须将它添加到一个元素上。但是如果想切换多个元素呢？此时可以把一个 template 元素当做不可见的包裹元素，并在上面使用 v-if。最终的渲染结果将不包含 template 元素。
+
+template元素补充
+
+**template**元素是一种用于保存客户端内容机制，该内容在加载页面时不会呈现，但随后可以在运行时使用JavaScript实例化。
+
+```html
+<table id="producttable">
+    <thead>
+        <tr>
+            <td>UPC_Code</td>
+            <td>Product_Name</td>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- 现有数据可以可选地包括在这里 -->
+    </tbody>
+</table>
+
+<template id="productrow">
+    <tr>
+        <td class="record"></td>
+        <td></td>
+    </tr>
+</template>
+<script>
+    var t = document.querySelector('#productrow'),
+        td = t.content.querySelectorAll("td");
+    td[0].textContent = "1235646565";
+    td[1].textContent = "Stuff";
+
+    var tb = document.getElementsByTagName("tbody");
+    var clone = document.importNode(t.content, true);
+    tb[0].appendChild(clone);
+</script>
+```
+
+template上使用v-if
+
+```html
+<div id="app">
+    <template v-if="awesome">
+        <h1>Title</h1>
+        <p>Paragraph 1</p>
+        <p>Paragraph 2</p>
+    </template>
+
+    <div v-if='type==="A"'>
+        A
+    </div>
+    <div v-else-if='type === "B"'>
+        B
+    </div>
+    <div v-else>
+        Not A/B
+    </div>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            awesome: true,
+            type: 'c'
+        }
+    })
+</script>
+
+```
+
+
+**用key管理可复用的元素**
+
+Vue 会尽可能高效地渲染元素，通常会复用已有元素而不是从头开始渲染。
+
+那么在下面的代码中切换 loginType 将不会清除用户已经输入的内容。因为两个模板使用了相同的元素，<input> 不会被替换掉——仅仅是替换了它的 placeholder。
+
+Vue还提供了不服用的一种方式,只需添加一个具有唯一值的 key 属性即可：
+
+```html
+<div id="app">
+    <template v-if='loginType==="username"'>
+        <label>username</label>
+        <input type="text" placeholder="Enter your username" key='username-input'>
+    </template>
+    <template v-else>
+        <label for="">Email</label>
+        <input type="text" placeholder="Enter your email address" key='email-input'>
+    </template>
+    <button @click='cs'>
+        Toggle login type
+    </button>
+</div>
+
+
+<script>
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            loginType: ''
+        },
+        methods: {
+            cs: function () {
+                if (this.loginType === '') {
+                    this.loginType = 'username'
+                } else {
+                    this.loginType = ''
+                }
+
+            }
+        }
+    })
+</script>
+```
+
+
+
+
+
+## v-show
+
+另一个用于根据条件展示元素的选项是 v-show 指令。用法大致一样：
+
+```html
+<h1 v-show="ok">Hello!</h1>
+```
+
+不同的是带有 v-show 的元素始终会被渲染并保留在 DOM 中。v-show 只是简单地切换元素的 CSS 属性 display。
+
+## v-if vs v-show
+
+v-if 是“真正”的条件渲染，因为它会确保在切换过程中条件块内的事件监听器和子组件适当地被销毁和重建。
+
+v-if 也是惰性的：如果在初始渲染时条件为假，则什么也不做——直到条件第一次变为真时，才会开始渲染条件块。
+
+相比之下，v-show 就简单得多——不管初始条件是什么，元素总是会被渲染，并且只是简单地基于 CSS 进行切换。
+
+一般来说，v-if 有更高的切换开销，而 v-show 有更高的初始渲染开销。因此，如果需要非常频繁地切换，则使用 v-show 较好；如果在运行时条件很少改变，则使用 v-if 较好。
+
+
+
+# 列表渲染
+
+## 用 v-for 把一个数组对应为一组元素
+
+```javascript
+<ul id="v-for-object">
+    <li v-for='(item,index) in items'>
+        {{parentMessage}} - {{index}} -- {{item.message}}
+    </li>
+</ul>
+
+<script>
+    var vm = new Vue({
+        el: '#v-for-object',
+        data: {
+            parentMessage: 'Parent',
+            items: [
+                { message: 'Foo' },
+                { message: 'Bar' }
+            ]
+        }
+    });
+</script>
+```
+
+## 在v-for里使用对象
+
+```javascript
+<ul id="v-for-object">
+    <li v-for='(value,name,index) in objects'>
+        {{name}}:{{value}}:{{index}}
+    </li>
+</ul>
+
+<script>
+var vm = new Vue({
+    el: '#v-for-object',
+    data: {
+        objects: {
+            title: 'How to do lists in Vue',
+            author: 'Jane Doe',
+            publishedAt: '2016-04-10'
+        }
+    }
+});
+</script>
+```
+
+
+
+
