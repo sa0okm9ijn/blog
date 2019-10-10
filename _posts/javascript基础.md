@@ -1409,3 +1409,319 @@ for循环for-in循环最大的区别:for循环可以循环到稀松数组项，f
 12. navigator.online
 13. history
 14. location
+
+# 原型和原型链
+
+- 所有对象都是通过`new 函数`创建 这个函数叫构造函数
+- 
+![](2.jpg)
+  
+- 所有的函数也是对象 通过`new Function 函数`来创建 Function是js引擎启动的时候放到内存中
+  - 由于函数是对象，函数有属性.如Array.from、Number.isNaN
+- 所有对象都是引用类型.
+
+![](1.jpg)
+
+
+## 原型 prototype
+
+所有函数都有一个属性:`prototype`,称之为函数原型
+
+![](3.jpg)
+
+默认情况下,prototype是一个普通的Object对象
+
+默认情况下,prototype中有一个属性,constructor,它也是一个对象,它指向构造函数本身
+
+![](4.jpg)
+
+## 隐式原型 __proto__
+
+所有的对象都有一个属性`__proto__`称之为隐式原型
+
+默认情况下,隐式原型指向该对象构造函数的原型
+
+![](5.jpg)
+
+当访问一个对象的成员时:
+
+1. 看该对象自身是否拥有该成员,如果有直接使用
+2. 原型链中依次查找是否拥有该成员,如果有直接使用
+
+猴子补丁:在函数原型中加入成员,以增强对象的功能,会导致原型污染,使用需谨慎
+
+## 原型链
+
+默认情况下,我们有一个函数为A，那么对象`var a = new A();a.__proto__.__proto__.__proto__`如此构成一条链条,称为原型链
+
+特殊点：
+
+1. Function的__proto__指向自身的prototype
+2. Object的prototype的__proto__指向null
+
+![](6.jpg)
+
+## 练习题
+
+```javascript
+
+function User() {}
+User.prototype.sayHello = function() {}
+
+var u1 = new User();
+var u2 = new User();
+
+console.log(u1.sayHello === u2.sayHello); //true
+console.log(User.prototype.constructor); //User function
+console.log(User.prototype === Function.prototype); //false
+console.log(User.__proto__ === Function.prototype); //true
+console.log(User.__proto__ === Function.__proto__); //true
+console.log(u1.__proto__ === u2.__proto__);  //true
+console.log(u1.__proto__ === User.__proto__); //false
+console.log(Function.__proto__ === Object.__proto__);//true
+console.log(Function.prototype.__proto__ === Object.prototype.__proto__);//false 
+console.log(Function.prototype.__proto__ === Object.prototype); //true
+
+```
+
+
+
+
+# 原型链的应用
+
+## 基础方法
+
+W3C不推荐直接使用系统成员__proto__,会有性能上的损失
+
+关于静态方法和实例方法
+
+1. 静态方法
+
+直接在函数上申明，如
+
+```javascript
+
+function A(){}
+
+A.sayHello=function(){}
+
+A.sayHello();//调用
+
+```
+
+2. 实例方法
+
+```javascript
+
+function A(){}
+
+A.prototype.sayHello=function(){}
+
+var a = new A()
+
+a..sayHello() //调用
+
+```
+
+**Object.getPrototypeOf(对象)**
+
+获取对象的隐式原型
+
+`使用`
+
+```javascript
+
+var obj = {};
+
+Object.getPrototypeOf(obj)  === obj.__proto__
+
+```
+
+**Object.prototype.isPrototypeOf(对象)**
+
+判断当前对象(this)是否在指定对象的原型链上
+
+`使用`
+
+```javascript
+
+function A(){}
+
+var obj = new A()
+
+Object.prototype.isPrototypeOf(obj)
+
+判断Object是不是在obj的原型链上
+
+```
+
+`使用`
+
+**对象 instanceof 函数**
+
+判断函数的原型是否在对象的原型链上
+
+
+不推荐使用
+
+```javascript
+
+[] instanceof Array
+//是否是真数组
+
+
+```
+
+**Object.create(对象)**
+
+创建一个新对象，其隐式原型指向指定的对象
+
+
+`使用`
+
+```javascript
+var obj = {};
+
+obj = Object.create(Object.prototype)
+
+创建一个对象 其隐式原型指向Object.prototype
+
+
+
+var obj = Object.create(null)
+
+obj的隐式原型为null
+
+**是不是所有的对象原型链最终都是object**
+
+**不是**
+
+
+```
+
+**Object.prototype.hasOwnProperty(属性名)**
+
+判断一个对象**自身**是否拥有某个属性
+
+**循环的时候筛选原型链上的对象，不会循环Object上的属性(由于属性描述符的原因)**
+
+
+## 应用
+
+**类数组转换为真数组**
+
+```js
+Array.prototype.slice.call(类数组);
+
+[].slice.call(类数组) //这个方法会创建一个新数组
+```
+
+**实现继承**
+
+默认情况下，所有构造函数的父类都是Object
+
+
+示例如下
+
+默认用户为User,有方法sayHello
+
+```javascript
+function User(firstName,lastName,age){
+    this.firstName=firstName;
+    this.lastName=lastName;
+    this.age=age;
+    this.fullName=this.firstName+''+this.lastName;
+}
+User.prototype.sayHello=function(){
+    console.log(`大家好,我叫${this.fullName},今年${this.age}岁了`);
+}
+```
+
+模型如下
+
+![](2019-10-09_161600.png)
+
+现在有VIP用户,有方法upgrade
+
+```javascript
+function VIPUser(firstName, lastName, age, money) {
+    User.call(this, firstName, lastName, age);
+    this.money = money;
+}
+
+VIPUser.prototype.upgrade = function() {
+    console.log(`使用了${100}元软妹币，升级了！`);
+    this.money -= 100;
+}
+```
+
+我们通过call减少了部分代码的重复,目前模型如下
+
+![](2019-10-09_161919.png)
+
+VIPUser应该也是User的子类，这并不是我们想要的结构
+
+实现如下
+
+```javascript
+function inherit(son, father) {
+    //创建一个对象 该对象的隐式原型为father的原型
+    son.prototype = Object.create(father.prototype);
+}
+```
+
+到了现在我们让VIPUser成为了User的子类。观察User的原型，其中有constructor，并且指向User
+
+我们的VIPUser没有constructor,那么我们下面来创建这个constructor
+
+```javascript
+function inherit(son, father) {
+    //创建一个对象 该对象的隐式原型为father的原型
+    son.prototype = Object.create(father.prototype);
+    son.prototype.constructor = son;
+}
+```
+
+到现在位置我们的VIPUser就已经继承了User了
+
+
+有的时候我们为了操作方便会加一个uber(`super`保留字不可在用了)
+
+```javascript
+function inherit(son, father) {
+    //创建一个对象 该对象的隐式原型为father的原型
+    son.prototype = Object.create(father.prototype);
+    son.prototype.constructor = son;
+    son.prototype.uber=father.prototype;
+    // son.prototype.uber= father  //老师用的写法
+}
+```
+
+到现在为止我们就实现了一个继承,但是上面的create是ES5的写法，下面我实现一个兼容性的写法(`圣杯模式`)
+
+圣杯模式
+
+```javascript
+function inherit(son,father){
+    var Temp = function(){}
+    Temp.prototype=father.prototype;
+    son.prototype = new Temp();
+    son.prototype.constructor=son;
+    son.prototype.uber=father.prototype; 
+}
+```
+
+对每次创建的Temp进行优化处理
+
+```javascript
+var inherit= (function(){
+    var Temp = function(){}
+    return function(son,father){
+        Temp.prototype=father.prototype;
+        son.prototype = new Temp();
+        son.prototype.constructor=son;
+        son.prototype.uber=father.prototype; 
+    }
+})()
+
+```
