@@ -64,7 +64,7 @@ var obj = {
 
 ### 示例2 圆的自由滚动
 
-```
+```javascript
 <script>
     function Circle() {
         this.width = 100;

@@ -1393,22 +1393,6 @@ for(var prop in 对象){
 
 for循环for-in循环最大的区别:for循环可以循环到稀松数组项，for-in循环循环不到
 
-# window 对象属性
-
-1. innerwidth innerheight   clientwidth innerheight
-2. pageXOffset pageYOffset 
-3. screenleft(screenX) screentop(screenY) 浏览器窗口在屏幕上的坐标
-4. window.parent
-5. window.name
-6. alert()
-7. confirm()
-8. prompt()
-9. onbeforeunload()
-10. open('https://www.baidu.com','duyi','width=200,height=200')
-11. navigator.userAgent
-12. navigator.online
-13. history
-14. location
 
 # 原型和原型链
 
@@ -1725,3 +1709,190 @@ var inherit= (function(){
 })()
 
 ```
+
+# 执行上下文
+
+执行上下文:一个函数运行前,创建的一块内存空间.空间中包含有该函数所需要的数据,为该函数提供支持
+
+执行上下文栈:call stack,所有执行上下文组成的内存空间
+
+栈:先进后出  入栈(push) 出栈(pop)  栈底  栈顶
+
+全局执行上下文:所有js代码执行之前,都必须有该环境
+
+JS引擎始终执行的是栈顶的上下文。
+
+![](stack.gif)
+
+
+## 执行上下文中的内容
+
+1. this指向
+
+1). 直接调用函数,this指向全局
+2). 在函数外,this指向全局对象
+3). 通过对象调用或new一个函数,this指向调用的对象或新对象
+
+![](2019-11-04_054302.png)
+
+2. VO变量对象
+
+variable Object: VO中记录了该环境中所有声明的参数、变量和函数
+
+Global Object: GO，全局执行上下文中的VO
+
+Active Object：AO，当前正在执行的上下文中的VO
+
+
+
+1). 确定所有形参值以及特殊变量arguments
+2). 确定函数中通过var声明的变量，将它们的值设置为undefined，如果VO中已有该名称，则直接忽略。
+3). 确定函数中通过字面量声明的函数，将它们的值设置为指向函数对象，如果VO中已存在该名称，则覆盖。
+
+当一个上下文中的代码执行的时候，如果上下文中不存在某个属性，则会从之前的上下文寻找。
+
+![](2019-11-04_054335.png)
+
+# 作用域链
+
+1. VO中包含一个额外的属性，该属性指向创建该VO的函数本身
+2. 每个函数在创建时，会有一个隐藏属性```[[scope]]```，它指向创建该函数时的AO
+3. 当访问一个变量时，会先查找自身VO中是否存在，如果不存在，则依次查找```[[scope]]```属性。
+
+某些浏览器会优化作用域链，函数的```[[scope]]```中仅保留需要用到的数据。 
+
+![](2019-11-04_060052.png)
+
+# 事件循环
+
+异步：某些函数不会立即执行，需要等到某个时机成熟后才会执行，该函数叫做异步函数。
+
+浏览器的线程：
+
+1. JS执行引擎：负责执行JS代码
+2. 渲染线程：负责渲染页面
+3. 计时器线程：负责计时
+4. 事件监听线程：负责监听事件
+5. http网络线程：负责网络通信
+
+事件队列：一块内存空间，用于存放执行时机到达的异步函数。当JS引擎空闲（执行栈没有可执行的上下文），它会从事件队列中拿出第一个函数执行。
+
+事件循环：event loop，是指函数在执行栈、宿主线程、事件队列中的循环移动。
+
+![](2019-11-04_061721.png)
+
+# 对象混合和对象克隆
+
+## 对象混合
+
+
+```javascript
+/**
+ * obj2混合到obj1产生新的对象
+ */
+ function mixin=function(obj1,obj2){
+     //第一个参数写{}原因,这个函数是后一个函数复制到前一个函数上,返回结果和obj1相同,所以写{}
+     return Object.assign({},obj1,obj2);
+     
+    //  var newObj={};
+    //  for(var prop in obj2){
+    //      newObj[prop]=obj2[prop]
+    //  }
+
+    //  for(var prop in obj1){
+    //      if(!prop in obj1){
+    //          newObj[prop]=obj1[prop]
+    //      }
+    //  }
+    //  return newObj;
+ }
+
+```
+
+## 对象克隆
+
+
+```javascript
+/**
+ * 克隆一个对象
+ * @param {boolean} deep 是否深度克隆
+ */
+
+ function clone(obj,deep){
+     if(Array.isArray(obj)){
+         if(deep){
+             var newArr=[];
+             for(var i = 0;i<obj.length;i++){
+                 newArr.push(this.clone(obj[i],deep));
+             }
+
+         }else{
+             return obj.slice();
+         }
+     }else if(typeof(obj) === "object"){
+         var newObj={};
+         for(var prop in obj){
+             if(deep){
+                 newObj[prop] = this.clone(obj[prop],deep);
+             }else{
+                 newObj[prop]=obj[prop]
+             }
+         }
+         return newObj;
+     }else{
+         return obj;
+     }
+ }
+
+```
+
+# 函数防抖和节流
+
+在前端开发中有一部分的用户行为会频繁的触发事件执行，而对于DOM操作、资源加载等耗费性能的处理，很可能导致界面卡顿，甚至浏览器的崩溃。函数节流(throttle)和函数防抖(debounce)就是为了解决类似需求应运而生的
+
+## 节流
+
+函数节流就是预定一个函数只有在大于等于执行周期时才执行，周期内调用不执行。好像水滴攒到一定重量才会落下一样
+
+```javascript
+function throttle=function(callback,time,immediately){
+    if(immediately){
+        immediately=true;
+    }
+    if(immediately){
+        var t;
+        if(!t  || Date.now()-t >= time){
+            callback.apply(null,arguments);
+            t=Date.now();
+        }
+    }else{
+        var timer;
+        if(timer){
+            return;
+        }
+        var args=arguments;
+        timer=setTimeout(function(){
+            callback.apply(null,args);
+            timer=null;
+        },time)
+    }
+}
+```
+
+## 防抖
+
+函数防抖就是在函数需要频繁触发的情况时,只有足够空闲的时间,才执行一次.
+
+```javascript
+function debounce(handle,delay){
+    var timer=null;
+    return function(){
+        var _self=this,_arg=arguments;
+        clearTimeout(timer);
+        timer=setTimeout(function(){
+            handler.apply(_self,_arg);
+        },delay)
+    }
+}
+```
+
