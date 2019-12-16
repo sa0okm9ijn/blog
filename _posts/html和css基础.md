@@ -98,7 +98,7 @@ HTML、CSS -> 浏览器内核 -> 页面
 
 文档声明，告诉浏览器，当前文档使用的HTML标准是HTML5。
 
-不写文档声明，将导致浏览器进入怪异渲染模式。
+不写文档声明，将导致浏览器进入怪异渲染模式（混杂模式）。混杂模式可以向后兼容。可以通过```document.compatMode```来区分模式
 
 ```html
 <html lang="en">
@@ -196,6 +196,8 @@ h1元素：一级标题
 
 
 # 文本元素
+
+HTML5元素周期表[](http://www.xuanfengge.com/funny/html5/element/)
 
 ## h 
 
