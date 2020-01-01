@@ -151,8 +151,20 @@ npm是什么东东？npm其实是Node.js的包管理工具,类似c#的nug等,在
 
 以前我的JS，CSS，HTML文件分开写,也没什么问题,可是着前端的发展，社区的壮大，各种前端的库和框架层出不穷，我们项目中可能会使用很多额外的库，如何有效管理这些引入的库文件是一个大问题，而且我们知道基于在HTML中使用``<script>``引入的方式，有两个弊端，一个是会重复引入，二是当库文件数量很多时管理成为一个大难题。面对这样的局面，为了简化开发的复杂度，前端社区涌现了很多实践方法。模块化就是其中一项成功实践,而npm就是这样在node社区中产生的
 
+为啥我们需要一个包管理工具呢？因为我们在Node.js上开发时，会用到很多别人写的JavaScript代码。如果我们要使用别人写的某个包，每次都根据名称搜索一下官方网站，下载代码，解压，再使用，非常繁琐。于是一个集中管理的工具应运而生：大家都把自己开发的模块打包后放到npm官网上，如果要使用，直接通过npm安装就可以直接用，不用管代码存在哪，应该从哪下载。
 
-## 模块化
+更重要的是，如果我们要使用模块A，而模块A又依赖于模块B，模块B又依赖于模块X和模块Y，npm可以根据依赖关系，把所有依赖的包都下载下来并管理起来。否则，靠我们自己手动管理，肯定既麻烦又容易出错。
+
+讲了这么多，npm究竟在哪？
+
+其实npm已经在Node.js安装的时候顺带装好了。我们在命令提示符或者终端输入npm -v，应该看到类似的输出：
+
+```
+npm -v
+6.9.0
+```
+
+## js模块化
 
 我们平常的开发中主要用以下几种方式开发,来做到代码的高内聚,低耦合,以及代码的复用、避免变量的命名冲突等问题.
 
@@ -218,33 +230,368 @@ var exports = module.exports;
 注意，不能直接将exports变量指向一个值，因为这样等于切断了exports与module.exports的联系。
 如果你觉得，exports与module.exports之间的区别很难分清，一个简单的处理方法，就是放弃使用exports，只使用module.exports。
 
+示例如下,此处示例为node环境下执行,如果需要在浏览器执行需要工具转化
+```javascript
+// commonjs/
+// |
+// +- modules/
+// |  |
+// |  +- m1.js <-- 模块1
+// |  |
+// |  +- m2.js <-- 模块2
+// |  |
+// |  +- m3.js <-- 模块3
+// |
+// +- index.js <-- 使用koa的js
+
+//m1.js
+module.exports = {
+    msg: "m1",
+    foo: function () {
+        return this.msg;
+    }
+}
+//m2.js
+module.exports = function(){
+    return 'm2';
+}
+//m3.js
+exports.foo = function () {
+    return 'm3';
+}
+//index.js
+var m1 = require('./modules/m1');
+var m2 = require('./modules/m2');
+var m3 = require('./modules/m3');
+
+console.log(m1.foo());
+console.log(m2());
+console.log(m3.foo());
+```
+
 
 ### AMD
+CommonJs为服务端而生,采用同步加载方式,因此不适用浏览器端.
+AMD规范则是异步加载模块,允许调用指定回调函数
+
+* 使用define定义一个模块,使用require来加载一个模块``define(moduleId,['module1','module2'],function(m1,m2){})``
+* 使用依赖require.js
+* 依赖前置
+
+```javascript
+// commonjs/
+// |
+// +- libs/
+// |  |
+// |  +- jquery-3.4.1.min.js <-- jquery
+// |  |
+// |  +- require.js <-- requery
+// +- modules/
+// |  |
+// |  +- m1.js <-- m1
+// |  |
+// |  +- m2.js <-- m1
+// +- demo.js <-- 使用koa的js
+// +- demo.html
+//m1.js
+define(function () {
+    var name = 'm1-amd';
+
+    function getName() {
+        return name;
+    };
+    return {
+        getName
+    };
+})
+//m2.js
+define(['m1'], function (m1) {
+    var msg = 'm2-amd';
+
+    function show() {
+        console.log(msg, m1.getName());
+    };
+    return {
+        show
+    };
+})
+//demo.js
+(function () {
+    require.config({
+        paths: {
+            m2: './modules/m2',
+            m1: './modules/m1',
+            jquery: './libs/jquery-3.4.1.min'
+        }
+    });
+    //此处jquery为jquery暴露的名称不可更改
+    require(['m2', 'jquery'], function (m2, $) {
+        m2.show();
+        $('body').css('backgroundColor', '#000');
+    })
+})()
+//demo.html
+<script src="./libs/require.js" data-main="./demo.js"></script>
+//require.js在加载的时候会检查data-main属性，当加载完毕，data-main属性规定的js文件会第一个被require.js加载并执行
+```
+
 ### CMD
+CMD异步加载,跟AMD的主要区别在于,AMD依赖前置,提前加载依赖.而CMD就近加载,按需加载
+* 使用define定义一个模块,使用require来加载一个模块``define(function(require,exports,module){})``
+* 使用依赖sea.js
+* 就近加载,按需加载
+
+```javascript
+// commonjs/
+// |
+// +- modules/
+// |  |
+// |  +- m1.js <-- m1
+// |  |
+// |  +- m2.js <-- m1
+// |  |
+// |  +- m3.js <-- m1
+// |  |
+// |  +- m4.js <-- m1
+// +- app.js <-- 使用koa的js
+// +- index.html
+// +- sea.js
+//m1.js
+define(function (require, exports, module) {
+    var msg = "m1";
+
+    function foo() {
+        console.log(msg);
+    }
+    module.exports = {
+        foo: foo
+    }
+})
+//m2.js
+define(function (require, exports, module) {
+    var msg = "m2";
+
+    function bar() {
+        console.log(msg);
+    }
+    module.exports = bar;
+})
+//m3.js
+define(function (require, exports, module) {
+    var msg = "m3";
+
+    function foo() {
+        console.log(msg);
+    }
+    exports.m3 = foo;
+})
+//m4.js
+define(function (require, exports, module) {
+    var msg = 'm4';
+    //同步加载
+    var m2 = require('./m2');
+    m2();
+    //异步加载
+    require.async('./m3', function (m3) {
+        m3.m3();
+    });
+
+    function fun() {
+        console.log(msg);
+    };
+    exports.m4 = fun;
+})
+//app.js
+define(function (require, exports, module) {
+    var m1 = require('/modules/m1');
+    m1.foo();
+
+    var m4 = require('/modules/m4');
+    m4.m4();
+})
+//index.html
+    <script src="./sea.js"></script>
+    <script>
+        seajs.use('./app.js');
+    </script>
+```
+
 ### Es6
+ES6自带模块化,可以使用import引入模块,export导出模块
 
-
-
-
-
-为啥我们需要一个包管理工具呢？因为我们在Node.js上开发时，会用到很多别人写的JavaScript代码。如果我们要使用别人写的某个包，每次都根据名称搜索一下官方网站，下载代码，解压，再使用，非常繁琐。于是一个集中管理的工具应运而生：大家都把自己开发的模块打包后放到npm官网上，如果要使用，直接通过npm安装就可以直接用，不用管代码存在哪，应该从哪下载。
-
-更重要的是，如果我们要使用模块A，而模块A又依赖于模块B，模块B又依赖于模块X和模块Y，npm可以根据依赖关系，把所有依赖的包都下载下来并管理起来。否则，靠我们自己手动管理，肯定既麻烦又容易出错。
-
-讲了这么多，npm究竟在哪？
-
-其实npm已经在Node.js安装的时候顺带装好了。我们在命令提示符或者终端输入npm -v，应该看到类似的输出：
-
+* 导出
+```javascript
+//暴漏变量
+export var a= '123';
+//暴漏函数
+export function myFun(){}
+//默认暴漏变量函数
+export default a='123'
+export function myFun(){}
 ```
-npm -v
-6.9.0
+* 导入
+```javascript
+import {m1,m2} from 'lib';
 ```
 
 
+## css模块化(预处理器less)
 
+less是一门向后兼容的css扩展语言,是一种动式的语言,属于css预处理语言的一种
+
+### 在浏览器中使用less
+
+在浏览器中使用less,需要less.js的支持,并且必须式http协议打开的网页,文件协议打开的会报错
+```html
+<link rel="stylesheet/less" type="text/css" href="./index.less">
+<script src="//cdnjs.cloudflare.com/ajax/libs/less.js/2.5.3/less.min.js"></script>
+```
+
+### 在node中使用less
+
+在node中使用less,即把less文件编译成浏览器支持的css文件,安装less``npm install -g less``,编译``lessc index.less > index.css``,即编译成了浏览器支持的css文件
+
+### less基本语法
+
+* 嵌套
+```less
+body {
+    .wrapper {
+        .box {
+            width: 100px;
+            height: 100px;
+            border-bottom: solid 1px red;
+        }
+    }
+}
+```
+* 变量及变量运算
+```less
+@color: blue;
+@w: 400px;
+@h: @w+100px;
+
+
+.box {
+    width: @w;
+    height: @h;
+    border-bottom: solid 1px @color;
+}
+```
+* 作用域
+```less
+body {
+    @size:10px;
+    .wrapper {
+        @size:15px;
+        .box {
+            @size:20px;
+            font-size: @size;//输出20px
+            width: 100px;
+            height: 100px;
+            border-bottom: solid 1px red;
+        }
+    }
+}
+```
+* 作用域的延迟加载
+```less
+body {
+    @size:10px;
+    .wrapper {
+        @size:15px;
+        .box {
+            @size:20px;
+            font-size: @size;//输出25px
+            width: 100px;
+            height: 100px;
+            @size:25px;
+            border-bottom: solid 1px red;
+        }
+    }
+}
+```
+* 混合 将相同样式抽离 从一个规则引入到另一个规则集的方式
+```less
+.border{
+    border-top: 1px solid red;
+    border-bottom:  1px solid blue;
+}
+
+body {
+    .wrapper {
+        width: 200px;
+        height: 200px;
+        .border;
+        .box {
+            margin-top: 50px;
+            width: 100px;
+            height: 100px;
+            .border;
+        }
+    }
+}
+```
+* 混合 带变量及默认值的混合 
+```less
+.border(@width:5px,@c:#ccc){
+    border:@width solid @c;
+}
+
+body {
+    .wrapper {
+        width: 200px;
+        height: 200px;
+        .border();
+        .box {
+            margin-top: 50px;
+            width: 100px;
+            height: 100px;
+            .border(3px,#dd0);
+        }
+    }
+}
+```
+* 模块引入
+```less
+@import './trangle.less';
+```
+* arguments
+```less
+.border(@w,@s,@c){
+    border:@arguments;
+}
+
+.box{
+    width: 200px;
+    height: 200px;
+    .border(1px,solid,#000);
+}
+```
+* 匹配
+```less
+.trangle(B, @color, @w) {
+    width: 0;
+    height: 0;
+    border-width: @w;
+    border-style: solid;
+    border-color: @color transparent transparent transparent;
+}
+
+.trangle(T, @color, @w) {
+    width: 0;
+    height: 0;
+    border-width: @w;
+    border-style: solid;
+    border-color: transparent transparent @color transparent;
+}
+    .box {
+        //匹配
+        .trangle(T,blue,40px);
+    }
+```
 
 ## 全局对象和全局变量
-
 
 因为Node.js是运行在服务区端的JavaScript环境，服务器程序和浏览器程序相比，最大的特点是没有浏览器的安全限制了，而且，服务器程序必须能接收网络请求，读写文件，处理二进制内容，所以，Node.js内置的常用模块就是为了实现基本的服务器功能。这些模块在浏览器环境中是无法被执行的，因为它们的底层代码是用C/C++在Node.js运行环境中实现的。
 
@@ -545,7 +892,7 @@ console.log('私钥解密'+dec_by_prv.toString('utf8'));
 ### koa Web框架
 
 koa是Express的下一代基于Node.js的web框架，目前有1.x和2.0两个版本。
-
+ 
 * 历史
 1. Express
 Express是第一代最流行的web框架，它对Node.js的http进行了封装，用起来如下：
@@ -730,25 +1077,27 @@ console.log('app started at port 3000');
 
 如果能把URL处理函数集中到某个js文件，或者某几个js文件中就好了，然后让app.js自动导入所有处理URL的函数。这样，代码一分离，逻辑就显得清楚了。
 
-url2-koa/
-|
-+- controllers/
-|  |
-|  +- hello.js <-- 处理login相关URL
-|  |
-|  +- index.js <-- 处理用户管理相关URL
-|
-+- app.js <-- 使用koa的js
-|
-+- controller.js <-- 自动处理url函数js
-|
-+- package.json <-- 项目描述文件
-|
-+- node_modules/ <-- npm安装的所有依赖包
+
 
 
 * 重构
 ```javascript
+// url2-koa/
+// |
+// +- controllers/
+// |  |
+// |  +- hello.js <-- 处理login相关URL
+// |  |
+// |  +- index.js <-- 处理用户管理相关URL
+// |
+// +- app.js <-- 使用koa的js
+// |
+// +- controller.js <-- 自动处理url函数js
+// |
+// +- package.json <-- 项目描述文件
+// |
+// +- node_modules/ <-- npm安装的所有依赖包
+
 //hello.js
 
 var fn_hello = async (ctx, next) => {
@@ -857,14 +1206,1240 @@ app.listen(3000);
 
 
 
+#### 使用Nunjucks
 
-### webpack
+Nunjucks是什么东东？其实它是一个模板引擎。
+那什么是模板引擎？
+模板引擎就是基于模板配合数据构造出字符串输出的一个组件。比如下面的函数就是一个模板引擎：
 
-前端自动化构建工具.
+```javascript
+function examResult (data) {
+    return `${data.name}同学一年级期末考试语文${data.chinese}分，数学${data.math}分，位于年级第${data.ranking}名。`
+}
+```
 
-我们现在对node有了大概的了解,通俗的说node就是一种运行与服务器端的环境,他的语言是javascript,类似.Net平台它的语言是c#.其次,Node提供大量工具库，使得JavaScript语言与操作系统互动（比如读写文件、新建子进程），在这个意义上，Node又是JavaScript的工具库。
+如果我们输入数据如下：
 
-webpack无配置打包
+```javascript
+examResult({
+    name: '小明',
+    chinese: 78,
+    math: 87,
+    ranking: 999
+});
+```
+
+该模板引擎把模板字符串里面对应的变量替换以后，就可以得到以下输出：
+```
+小明同学一年级期末考试语文78分，数学87分，位于年级第999名。
+```
+
+模板引擎最常见的输出就是输出网页，也就是HTML文本。
+
+输出HTML有几个特别重要的问题需要考虑：JavaScript的模板字符串实现起来非常困难
+
+* 转义
+对特殊字符要转义，避免受到XSS攻击。比如，如果变量name的值不是小明，而是小明<script>...</script>，模板引擎输出的HTML到了浏览器，就会自动执行恶意JavaScript代码。
+* 格式化
+对不同类型的变量要格式化，比如，货币需要变成12,345.00这样的格式，日期需要变成2016-01-01这样的格式。
+* 简单逻辑
+```
+{{ name }}同学，
+{% if score >= 90 %}
+    成绩优秀，应该奖励
+{% elif score >=60 %}
+    成绩良好，继续努力
+{% else %}
+    不及格，建议回家打屁股
+{% endif %}
+```
+
+所以，我们需要一个功能强大的模板引擎，来完成页面输出的功能。
+
+
+我们选择Nunjucks作为模板引擎。Nunjucks是Mozilla开发的一个纯JavaScript编写的模板引擎，既可以用在Node环境下，又可以运行在浏览器端。但是，主要还是运行在Node环境下，因为浏览器端有更好的模板解决方案，例如MVVM框架。
+
+如果你使用过Python的模板引擎jinja2，那么使用Nunjucks就非常简单，两者的语法几乎是一模一样的，因为Nunjucks就是用JavaScript重新实现了jinjia2。
+
+* 基本渲染
+```javascript
+// use-nunjucks/
+// |
+// +- views/
+// |  |
+// |  +- hello.html <-- 处理login相关URL
+// |  |
+// +- app.js <-- 使用koa的js
+// +- package.json <-- 项目描述文件
+// |
+// +- node_modules/ <-- npm安装的所有依赖包
+
+//hello.html
+
+// <h1>hello {{name}}</h1>
+
+
+//简单的渲染 app.js
+var nunjucks = require('nunjucks');
+
+function createEnv(path, opts) {
+    var autoescape = opts.autoescape === undefined ? true : opts.autoescape;
+    var noCache = opts.noCache || false;
+    var watch = opts.watch | false;
+    var throwOnUndefined = opts.throwOnUndefined || false;
+    var env = new nunjucks.Environment(
+        new nunjucks.FileSystemLoader(path, {
+            noCache: noCache,
+            watch: watch
+        }), {
+            autoescape: autoescape,
+            throwOnUndefined: throwOnUndefined
+        }
+    )
+    return env;
+};
+var env = createEnv('views', {
+    watch: true,
+});
+
+var s = env.render('hello.html', {
+    name: '小明1'
+});
+console.log(s);
+```
+
+* 继承
+```javascript
+// use-nunjucks/
+// |
+// +- views/
+// |  |
+// |  +- base.html
+// |  +- extend.html
+// |
+// +- app.js <-- 使用koa的js
+// +- package.json <-- 项目描述文件
+// |
+// +- node_modules/ <-- npm安装的所有依赖包
+
+//base.html
+// <!DOCTYPE html>
+// <html lang="en">
+// <head>
+//     <meta charset="UTF-8">
+//     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+//     <title>Document</title>
+// </head>
+// <body>
+//     {% block header %}<h3>Unnamed</h3>{% endblock  %}
+//     {% block body %}<div>No body</div>{% endblock  %}
+//     {% block footer%}<div>copyright</div>{% endblock  %}    
+// </body>
+// </html>
+
+//extend.html
+
+// {% extends 'base.html' %}
+// {% block header%}<h1>{{header}}</h1>{% endblock  %}
+// {% block body%}<p>{{body}}</p>{% endblock %}
+
+
+//app.js
+
+console.log(env.render('extend.html',{
+    header:'hello',
+    body:'bla la la...'
+}));
+```
+
+* 性能
+对于模板渲染本身来说，速度是非常非常快的，因为就是拼字符串嘛，纯CPU操作。
+性能问题主要出现在从文件读取模板内容这一步。这是一个IO操作，在Node.js环境中，我们知道，单线程的JavaScript最不能忍受的就是同步IO，但Nunjucks默认就使用同步IO读取模板文件。
+好消息是Nunjucks会缓存已读取的文件内容，也就是说，模板文件最多读取一次，就会放在内存中，后面的请求是不会再次读取文件的，只要我们指定了noCache: false这个参数。
+在开发环境下，可以关闭cache，这样每次重新加载模板，便于实时修改模板。在生产环境下，一定要打开cache，这样就不会有性能问题。
+
+#### MVC
+我们已经可以用koa处理不同的URL，还可以用Nunjucks渲染模板。现在，是时候把这两者结合起来了！
+这就是传说中的MVC：Model-View-Controller，中文名“模型-视图-控制器”。
+
+* 异步函数是C：Controller，Controller负责业务逻辑，比如检查用户名是否存在，取出用户信息等等；
+* 包含变量{{ name }}的模板就是V：View，View负责显示逻辑，通过简单地替换一些变量，View最终输出的就是用户看到的HTML。
+* Model就是一个JavaScript对象：
+```javascript
+{ name: 'Michael' }
+```
+
+工程view-koa结构如下：
+```
+view-koa/
+|
++- controllers/ <-- Controller
+|
+| +- index.js
+| +- signin.js
++- views/ <-- html模板文件
+|
++- static/ <-- 静态资源文件
+|
++- controller.js <-- 扫描注册Controller
+|
++- static-files.js
+|
++- templating.js
+|
++- app.js <-- 使用koa的js
+|
++- package.json <-- 项目描述文件
+|
++- node_modules/ <-- npm安装的所有依赖包
+```
+
+这里只列出主要代码部分,静态资源文件和html文件自己补充即可
+
+```javascript
+//index.js
+module.exports = {
+    'GET /': async (ctx, next) => {
+        ctx.render('index.html', {
+            title: 'welcome'
+        });
+    }
+}
+//signin.js
+module.exports = {
+    'POST /signin': async (ctx, next) => {
+        var email = ctx.request.body.email || '';
+        var password = ctx.request.body.password || '';
+        if (email === 'admin@example.com' && password === '123456') {
+            ctx.render('signin-ok.html', {
+                title: 'Sign In Ok',
+                name: 'Mr Node'
+            });
+        } else {
+            ctx.render('signin-failed.html', {
+                title: 'Sign In Failed'
+            });
+        }
+    }
+}
+//app.js
+
+var Koa=require('koa');
+
+var app = new Koa();
+
+var bodyParser=require('koa-bodyParser');
+
+// 导入controller middleware:
+var controller = require('./controller');
+
+var staticFiles = require('./static-files');
+
+var templating = require('./templating');
+
+const isProduction = process.env.NODE_ENV === 'production';
+app.use(staticFiles('/static/', __dirname + '/static'));
+app.use(bodyParser());
+app.use(templating('views', {
+    noCache: !isProduction,
+    watch: !isProduction
+}));
+app.use(controller());
+app.listen(3000);
+
+//controller.js
+
+
+// 先导入fs模块，然后用readdirSync列出文件
+// 这里可以用sync是因为启动时只运行一次，不存在性能问题:
+var fs = require('fs');
+
+function addMapping(router, mapping) {
+    for (var url in mapping) {
+        if (url.startsWith('GET ')) {
+            var path = url.substring(4);
+            router.get(path, mapping[url]);
+            console.log(`register URL mapping: GET ${path}`);
+        } else if (url.startsWith('POST ')) {
+            var path = url.substring(5);
+            router.post(path, mapping[url]);
+            console.log(`register URL mapping: POST ${path}`);
+        } else {
+            console.log(`invalid URL: ${url}`);
+        }
+    }
+}
+
+function addControllers(router) {
+    var files = fs.readdirSync(__dirname + '/controllers');
+    var js_files = files.filter((f) => {
+        return f.endsWith('.js');
+    });
+
+    for (var f of js_files) {
+        console.log(`process controller: ${f}...`);
+        console.log(__dirname + '/controllers/' + f);
+        let mapping = require(__dirname + '/controllers/' + f);
+       
+        addMapping(router, mapping);
+    }
+}
+
+
+module.exports = function (dir) {
+    var controllers_dir = dir || 'controllers'; // 如果不传参数，扫描目录默认为'controllers'
+    var router = require('koa-router')();
+    addControllers(router, controllers_dir);
+    return router.routes();
+}
+//static-files.js
+var path = require('path');
+var mime = require('mime');
+var fs = require('mz/fs');
+
+// url: 类似 '/static/'
+// dir: 类似 __dirname + '/static'
+function staticFiles(url, dir) {
+    return async (ctx, next) => {
+        var rpath = ctx.request.path;
+        if (rpath.startsWith(url)) {
+            var fp = path.join(dir, rpath.substring(url.length));
+            if (await fs.exists(fp)) {
+                ctx.response.type = mime.lookup(rpath);
+                ctx.response.body = await fs.readFile(fp);
+            } else {
+                ctx.response.status = 404;
+            }
+        } else {
+            await next();
+        }
+    };
+}
+
+module.exports = staticFiles;
+
+//templating.js
+var nunjucks = require('nunjucks');
+
+function createEnv(path, opts) {
+    var
+        autoescape = opts.autoescape === undefined ? true : opts.autoescape,
+        noCache = opts.noCache || false,
+        watch = opts.watch || false,
+        throwOnUndefined = opts.throwOnUndefined || false,
+        env = new nunjucks.Environment(
+            new nunjucks.FileSystemLoader(path || 'views', {
+                noCache: noCache,
+                watch: watch,
+            }), {
+                autoescape: autoescape,
+                throwOnUndefined: throwOnUndefined
+            });
+    return env;
+}
+
+function templating(path, opts) {
+    var env = createEnv(path, opts);
+    return async (ctx, next) => {
+        ctx.render = function (view, model) {
+            // 把render后的内容赋值给response.body:
+            ctx.response.body = env.render(view, Object.assign({}, ctx.state || {}, model || {}));
+            // 设置Content-Type:
+            ctx.response.type = 'text/html';
+        };
+        // 继续处理请求:
+        await next();
+    }
+}
+module.exports = templating;
+```
+
+### mysql
+
+#### Sequelize
+
+Node的ORM框架Sequelize,依赖驱动mysql
+
+* 配置数据库相关配置
+```javascript
+//config.js
+var config = {
+    database: 'test', // 使用哪个数据库
+    username: 'root', // 用户名
+    password: '123', // 口令
+    host: 'localhost', // 主机名
+    port: 3306 // 端口号，MySQL默认3306
+};
+
+module.exports = config;
+```
+
+* 初始化一个实例
+```javascript
+const Sequelize = require('sequelize');
+const config = require('./config');
+
+var sequelize = new Sequelize(config.database, config.username, config.password, {
+    host: config.host,
+    dialect: 'mysql',
+    pool: {
+        max: 5,
+        min: 0,
+        idle: 30000
+    }
+});
+```
+* 定义模型,映射数据库表(此时的数据库应该存在一张表)
+```javascript
+var Pet = sequelize.define('pet', {
+    id: {
+        type: Sequelize.STRING(50),
+        primaryKey: true
+    },
+    name: Sequelize.STRING(100),
+    gender: Sequelize.BOOLEAN,
+    birth: Sequelize.STRING(10),
+    createdAt: Sequelize.BIGINT,
+    updatedAt: Sequelize.BIGINT,
+    version: Sequelize.BIGINT
+}, {
+    timestamps: false
+});
+```
+* 实现增删改查
+```javascript
+// //创建
+(async () => {
+    var dog = await Pet.create({
+        id: 'd-' + now,
+        name: 'Odie',
+        gender: false,
+        birth: '2008-08-08',
+        createdAt: now,
+        updatedAt: now,
+        version: 0
+    });
+    console.log('created: ' + JSON.stringify(dog));
+})();
+//查询
+(async () => {
+    var pets = await Pet.findAll({
+        where: {
+            name: 'Gaffey'
+        }
+    });
+    console.log(`find ${pets.length} pets:`);
+    for (let p of pets) {
+        console.log(JSON.stringify(p));
+    }
+})();
+
+//修改
+(async () => {
+    var pets = await Pet.findAll({
+        where: {
+            name: 'Gaffey'
+        }
+    });
+    pets.gender=true;
+    pets[0].save();
+})();
+
+//删除数据
+(async () => {
+    var pets = await Pet.findAll({
+        where: {
+            name: 'Gaffey'
+        }
+    });
+    await pets[0].destroy();
+})();
+```
+
+#### 规范化Model
+
+一个大型Web App通常都有几十个映射表，一个映射表就是一个Model。如果按照各自喜好，那业务代码就不好写。Model不统一，很多代码也无法复用。
+所以我们需要一个统一的模型，强迫所有Model都遵守同一个规范，这样不但实现简单，而且容易统一风格。
+* 统一主键，名称必须是id，类型必须是STRING(50)；
+* 主键可以自己指定，也可以由框架自动生成（如果为null或undefined）；
+* 所有字段默认为NOT NULL，除非显式指定；
+* 统一timestamp机制，每个Model必须有createdAt、updatedAt和version，分别记录创建时间、修改时间和版本号。其中，createdAt和updatedAt以BIGINT存储时间戳，最大的好处是无需处理时区，排序方便。version每次修改时自增。
+
+```javascript
+// model-sequelize/
+// |
+// +- .vscode/
+// |  |
+// |  +- launch.json <-- VSCode 配置文件
+// |
+// +- models/ <-- 存放所有Model
+// |  |
+// |  +- Pet.js <-- Pet
+// |  |
+// |  +- User.js <-- User
+// |
+// +- config.js <-- 配置文件入口
+// |
+// +- config-override.js <-- 默认配置文件
+// |
+// +- config-default.js <-- 默认配置文件
+// |
+// +- config-test.js <-- 测试配置文件
+// |
+// +- db.js <-- 如何定义Model
+// |
+// +- model.js <-- 如何导入Model
+// |
+// +- init-db.js <-- 初始化数据库
+// |
+// +- app.js <-- 业务代码
+// |
+// +- package.json <-- 项目描述文件
+// |
+// +- node_modules/ <-- npm安装的所有依赖包
+
+//db.js
+var Sequelize = require('sequelize');
+var uuid = require('uuid');
+
+var config = require('./config');
+
+console.log(`init sequelize...`);
+
+function generateId() {
+    return uuid.v4();
+}
+
+var sequelize = new Sequelize(config.database, config.username, config.password, {
+    host: config.host,
+    dialect: config.dialect,
+    pool: {
+        max: 5,
+        min: 0,
+        idle: 10000
+    }
+});
+var ID_TYPE = Sequelize.STRING(50);
+
+function defineModel(name, attributes) {
+    var attrs = {};
+    for (var key in attributes) {
+        var value = attributes[key];
+        if (typeof (value) == 'object' && value['type']) {
+            value.allowNull = value.allowNull || false;
+            attrs[key] = value;
+        } else {
+            attrs[key] = {
+                type: value,
+                allowNull: false,
+            }
+        }
+    };
+    attrs.id = {
+        type: ID_TYPE,
+        primaryKey: true
+    };
+    attrs.createAt = {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+    };
+    attrs.updateAt = {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+    };
+    attrs.version = {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+    };
+    return sequelize.define(name, attrs, {
+        tablename: name,
+        timestams: false,
+        hooks: {
+            beforeValidate: function (obj) {
+                var now = Date.now();
+                if (obj.isNewRecord) {
+                    console.log('will create entity...' + obj);
+                    if (!obj.id) {
+                        obj.id = generateId();
+                    };
+                    obj.createAt = now;
+                    obj.updateAt = now;
+                    obj.version = 0;
+                } else {
+                    console.log('will update entity...' + obj);
+                    obj.updateAt = now;
+                    obj.version++;
+                }
+            }
+        }
+    });
+};
+
+var TYPES = ['STRING', 'INTEGER', 'BIGINT', 'TEXT', 'DOUBLE', 'DATEONLY', 'BOOLEAN'];
+
+var exp = {
+    defineModel: defineModel,
+    sync: () => {
+        if (process.env.NODE_ENV !== 'production') {
+            sequelize.sync({
+                force: true
+            });
+        } else {
+            throw new Error('Cannot sync() when NODE_ENV is set to \'production\'.');
+        }
+    }
+};
+
+for (var type of TYPES) {
+    exp[type] = Sequelize[type];
+};
+
+exp.ID = ID_TYPE;
+exp.generateId = generateId;
+
+module.exports = exp;
+
+//init-db.js
+var model = require('./model.js');
+model.sync();
+//model.js
+var fs = require('fs');
+var db = require('./db');
+var files = fs.readdirSync(__dirname + '/models');
+var js_files = files.filter((f) => {
+    return f.endsWith('.js');
+});
+module.exports = {};
+for (var f of js_files) {
+    console.log(`import model from file ${f}...`);
+    var name = f.substring(0, f.length - 3);
+    module.exports[name] = require(__dirname + '/models/' + f);
+}
+module.exports.sync = () => {
+    db.sync();
+};
+//config.js
+var defaultConfig = './config-default.js';
+
+var overrideConfig = './config-override.js';
+
+var testConfig = './config-test.js';
+
+var fs = require('fs');
+
+var config = null;
+
+if (process.env.NODE_ENV === 'test') {
+    console.log(`load ${testConfig}...`);
+    config = require(testConfig);
+} else {
+    console.log(`load ${defaultConfig}...`);
+    config = require(defaultConfig);
+    try {
+        if (fs.statSync(overrideConfig).isFile()) {
+            console.log(`load ${overrideConfig}...`);
+            config = Object.assign(config, require(overrideConfig));
+            console.log(config);
+        }
+    } catch (err) {
+        console.log(`Cannot load ${overrideConfig}`);
+    }
+};
+
+module.exports = config;
+
+//config-default.js
+var config = {
+    dialect: 'mysql',
+    database: 'test',
+    username: 'root',
+    password: '123',
+    host: 'localhost',
+    port: 3306
+};
+
+module.exports = config;
+//app.js
+var model = require('./model');
+
+var Pet = model.Pet;
+var User = model.User;
+
+(async () => {
+    var user = await User.create({
+        name: 'John',
+        gender: false,
+        email: 'john-' + Date.now() + '@garfield.pet',
+        passwd: 'hahaha'
+    });
+    console.log('created' + JSON.stringify(user));
+    var cat = await Pet.create({
+        ownerId: user.id,
+        name: 'Garfield',
+        gender: false,
+        birth: '2007-07-07',
+    });
+    console.log('created: ' + JSON.stringify(cat));
+})();
+//Pet.js
+var db = require('../db');
+module.exports = db.defineModel('pets', {
+    ownerId: db.ID,
+    name: db.STRING(100),
+    gender: db.BOOLEAN,
+    birth: db.STRING(10),
+})
+```
+
+### mocha
+
+mocha是JavaScript的一种单元测试框架，既可以在浏览器环境下运行，也可以在Node.js环境下运行。
+
+* 既可以测试简单的JavaScript函数，又可以测试异步代码，因为异步是JavaScript的特性之一；
+* 可以自动运行所有测试，也可以只运行特定的测试；
+* 可以支持before、after、beforeEach和afterEach来编写初始化代码。
+
+如果一个模块在运行的时候并不需要，仅仅在开发时才需要，就可以放到devDependencies中。这样，正式打包发布时，devDependencies的包不会被包含进来。
+
+然后使用npm install -D package安装
+
+#### 编写测试
+```javascript
+// hello-test/
+// |
+// +- .vscode/
+// |  |
+// |  +- launch.json <-- VSCode 配置文件
+// |
+// +- hello.js <-- 待测试js文件
+// |
+// +- test/ <-- 存放所有test
+// ｜ ｜
+// |  +- hello-test.js <-- 测试文件
+// |
+// +- package.json <-- 项目描述文件
+// |
+// +- node_modules/ <-- npm安装的所有依赖包
+//hello.js
+module.exports = function (...rest) {
+    var sum = 0;
+    for (var n of rest) {
+        sum += n;
+    }
+    return sum;
+}
+//hello-test.js
+var assert = require('assert');
+
+var sum = require('../hello');
+
+describe("#helo.js", () => {
+
+    before(function(){
+        console.log('before');
+    });
+
+    after(function(){
+        console.log('after');
+    });
+
+    beforeEach(function(){
+        console.log('beforeEach');
+    });
+
+    afterEach(function(){
+        console.log('afterEach');
+    });
+    it('sum() shoud return 0', () => {
+        assert.strictEqual(sum(), 0);
+    });
+    it('sum(1) should return 1', () => {
+        assert.strictEqual(sum(1), 1);
+    });
+
+    it('sum(1, 2) should return 3', () => {
+        assert.strictEqual(sum(1, 2), 3);
+    });
+
+    it('sum(1, 2, 3) should return 6', () => {
+        assert.strictEqual(sum(1, 2, 3), 6);
+    });
+});
+```
+mocha默认执行test目录下的所有测试,不要去改变默认目录
+
+#### 异步测试
+```javascript
+// async-test/
+// |
+// +- .vscode/
+// |  |
+// |  +- launch.json <-- VSCode 配置文件
+// |
+// +- hello.js <-- 待测试js文件
+// |
+// +- data.txt <-- 待测试js文件
+// |
+// +- test/ <-- 存放所有test
+// ｜ ｜
+// |  +- await-test.js <-- 测试文件
+// |
+// +- package.json <-- 项目描述文件
+// |
+// +- node_modules/ <-- npm安装的所有依赖包
+
+//hello.js
+var fs= require('mz/fs');
+
+module.exports=async()=>{
+    var expression=await fs.readFile('./data.txt','utf-8');
+    var fn = new Function('return '+expression);
+    var r = fn();
+    console.log(`Calculate:${expression}=${r}`);
+    return r;
+}
+//data.txt
+//1 + (2 + 4) * (9 - 2) / 3
+//await-test.js
+
+var assert=require('assert');
+var hello=require('../hello');
+
+describe('#async hello',()=>{
+    describe('#asyncCalculate',()=>{
+        it("#async with done",(done)=>{
+            (async function(){
+                try{
+                    var r = await hello();
+                    assert.strictEqual(r,15);
+                    done();
+                }catch(err){
+                    done(err);
+                }
+            })();
+        });
+        it('#async function', async () => {
+            let r = await hello();
+            assert.strictEqual(r, 15);
+        });
+
+        it('#sync function', () => {
+            assert(true);
+        });
+    });
+})
+```
+
+#### Http测试
+```javascript
+// koa-test/
+// |
+// +- .vscode/
+// |  |
+// |  +- launch.json <-- VSCode 配置文件
+// |
+// +- app.js <-- 待测试js文件
+// |
+// +- start.js <-- 待测试js文件
+// |
+// +- test/ <-- 存放所有test
+// ｜ ｜
+// |  +- app-test.js <-- 测试文件
+// |
+// +- package.json <-- 项目描述文件
+// |
+// +- node_modules/ <-- npm安装的所有依赖包
+//app.js
+var Koa = require('koa');
+
+var app = new Koa();
+
+app.use(async (ctx, next) => {
+    var start = new Date().getTime();
+    await next();
+
+    var ms = new Date().getTime() - start;
+    console.log(`${ctx.request.method} ${ctx.request.url}:${ms}ms`);
+    ctx.response.set('X-Response-Time', `${ms}ms`);
+})
+
+app.use(async (ctx, next) => {
+    var name = ctx.request.query.name || 'world';
+    ctx.response.type = 'text/html';
+    ctx.response.body = `<h1>hello,${name}!</h1>`;
+});
+
+module.exports=app;
+//app-test.js
+var request = require('supertest');
+var app = require('../app');
+describe('#test koa app', () => {
+    var server = app.listen(9900);
+    describe('#test server', () => {
+        it('#test GET /', async () => {
+            var res = await request(server)
+                .get('/')
+                .expect('Content-Type', /text\/html/)
+                .expect(200, '<h1>hello,world!</h1>');
+        });
+
+        it("#test GET /path?name=Bob", async () => {
+            var res = await request(server)
+                .get('/path?name=Bob')
+                .expect('Content-Type', /text\/html/)
+                .expect(200, '<h1>hello,Bob!</h1>');
+        });
+    });
+});
+```
+
+#### 运行测试
+
+* 在当前目录下,执行命令``node_modules\mocha\bin\mocha``
+* package.json中修改如下``"scripts": {"test": "mocha"},``,在当前目录下执行``npm test``
+* launch.json中配置
+```javascript
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceRoot}/hello.js",
+            "stopOnEntry": false,
+            "args": [],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": null,
+            "runtimeExecutable": null,
+            "runtimeArgs": [
+                "--nolazy"
+            ],
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "externalConsole": false,
+            "sourceMaps": false,
+            "outDir": null
+        },
+        {
+            "name": "Test",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceRoot}/node_modules/mocha/bin/mocha",
+            "stopOnEntry": false,
+            "args": [],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": null,
+            "runtimeExecutable": null,
+            "runtimeArgs": [
+                "--nolazy"
+            ],
+            "env": {
+                "NODE_ENV": "test"
+            },
+            "externalConsole": false,
+            "sourceMaps": false,
+            "outDir": null
+        }
+    ]
+}
+```
+注意第一个配置选项``Run``是正常执行一个.js文件，第二个配置选项``Test``我们填入``"program": "${workspaceRoot}/node_modules/mocha/bin/mocha"，``并设置``env为"NODE_ENV": "test"``，这样，就可以在VS Code中打开Debug面板，选择Test，运行，即可在Console面板中看到测试结果：
+
+### webSocket
+
+WebSocket是HTML5新增的协议,WebSocket并不是全新的协议，而是利用了HTTP协议来建立连接,让浏览器和服务器之间可以建立无限制的全双工通信，任何一方都可以主动发消息给对方
+首先，WebSocket连接必须由浏览器发起，因为请求协议是一个标准的HTTP请求，格式如下
+```
+GET ws://localhost:3000/ws/chat HTTP/1.1
+Host: localhost
+Upgrade: websocket
+Connection: Upgrade
+Origin: http://localhost:3000
+Sec-WebSocket-Key: client-random-string
+Sec-WebSocket-Version: 13
+```
+该请求和普通的HTTP请求有几点不同：
+* GET请求的地址不是类似/path/，而是以ws://开头的地址
+* 请求头Upgrade: websocket和Connection: Upgrade表示这个连接将要被转换为WebSocket连接；
+* Sec-WebSocket-Key是用于标识这个连接，并非用于加密数据；
+* Sec-WebSocket-Version指定了WebSocket的协议版本。
+随后，服务器如果接受该请求，就会返回如下响应：
+```
+HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Accept: server-random-string
+```
+该响应代码101表示本次连接的HTTP协议即将被更改，更改后的协议就是Upgrade: websocket指定的WebSocket协议
+
+在Node.js中，使用最广泛的WebSocket模块是ws
+
+#### ws模块
+
+* 开启服务端
+```javascript
+
+// 导入WebSocket模块:
+var WebSocket= require('ws');
+// 引用Server类:
+var WebSocketServer = WebSocket.Server;
+
+// 实例化
+var wss=new WebSocketServer({
+    port:3000
+})
+
+wss.on('connection',function(ws){
+    console.log(`[SERVER] connection()`);
+    ws.on("message",function(message){
+        console.log(`[SERVER] Received:${message}`);
+        ws.send(`ECHO:${message}`,(err)=>{
+            if(err){
+                console.log(`[SERVER] error:${err}`);
+            }
+        });
+    });
+});
+```
+
+
+* 客户端连接
+```javascript
+// 导入WebSocket模块:
+var WebSocket= require('ws');
+
+var ws = new WebSocket("ws://localhost:3000");
+ws.on('open',function(){
+    console.log(`[CLIENT] open()`);
+    ws.send('Hello!');
+});
+// 响应收到的消息:
+ws.on('message', function (message) {
+    console.log(`[CLIENT] Received: ${message}`);
+})
+```
+
+#### mvc中集成websocket
+
+### REST
+
+REST就是一种设计API的模式。最常用的数据格式是JSON。把网页视为一种客户端，是REST架构可扩展的一个关键。
+
+编写REST API，实际上就是编写处理HTTP请求的async函数，不过，REST请求和普通的HTTP请求有几个特殊的地方：
+* REST请求仍然是标准的HTTP请求，但是，除了GET请求外，POST、PUT等请求的body是JSON数据格式，请求的Content-Type为application/json；
+* REST响应返回的结果是JSON数据格式，因此，响应的Content-Type也是application/json。
+
+REST API规范
+* 例如，商品Product就是一种资源。获取所有Product的URL如下：``GET /api/products``
+* 而获取某个指定的Product，例如，id为123的Product，其URL如下：``GET /api/products/123``
+* 新建一个Product使用POST请求，JSON数据包含在body中，URL如下：``POST /api/products``
+* 更新一个Product使用PUT请求，例如，更新id为123的Product，其URL如下：``PUT /api/products/123``
+* 删除一个Product使用DELETE请求，例如，删除id为123的Product，其URL如下：``DELETE /api/products/123``
+* 当我们只需要获取部分数据时，可通过参数限制返回的结果集，例如，返回第2页评论，每页10项，按时间排序：``GET /api/products/123/reviews?page=2&size=10&sort=time``
+
+#### koa处理REST
+
+
+
+## webpack
+
+本质上，webpack 是一个现代 JavaScript 应用程序的静态模块打包器(module bundler)。当 webpack 处理应用程序时，它会递归地构建一个依赖关系图(dependency graph)，其中包含应用程序需要的每个模块，然后将所有这些模块打包成一个或多个 bundle.
+
+前端自动化构建工具,构建工具就是将源代码转换成可以执行的js、css、html代码.如:
+* less 解析less成css
+```
+lessc demo.less //直接在命令窗口看构建的css
+lessc demo.less > demo.css //构建css文件并输出到demo.css
+```
+* uplify-js 压缩js文件
+```
+uglifyjs demo.js -o demo.min.js
+```
+* browserify commonjs规范的模块化,浏览器并不兼容,通过browserify可以构建浏览器支持的js
+```
+browserify main.js -o bundle.js
+```
+构建工具主要包括以下几个方面
+* 代码转化,如将typescript编译成javascript、将scss编译成css等.
+* 文件优化,压缩js、css、html代码,压缩合并图片等.
+* 代码分割,提取多个页面的公共代码,提取首屏不需要执行部分代码让其异步加载
+* 模块合并,在采用模块化的项目中会有很多个模块和文件,需要通过构建工具将其合并成一个文件
+* 自动刷新,监听本地源代码,自动构建、刷新浏览器
+* 代码校验,在代码提交到仓库前校验代码是否符合规范,以及单元测试是否通过
+* 自动发布,更新代码后,自动构建上线代码发布并传输给发布系统
+
+常用的自动构建工具
+* 基于任务的,Grunt、Gulp
+* 基于模块的,Browserify、Webpack、rollup.js
+* 整合型工具,Yeoman、FIS、jdf、Athena
+
+
+webpack从4版本开始支持零配置打包,默认会找当前目录下src/index.js文件.默认只能处理js文件,处理其他文件需要加载不同的loader.webpack默认支持commonjs和es6.
+* 默认配置,在一个有``src/index.js``目录下执行``webpack``会自动生成``dist/main.js``
+* 个性配置,在一个有``demo.js``目录下执行``webpack demo.js -o bundle.js``会自动生成``bundle.js``
+* ``npm init``初始化一个项目,会生成一个package.json配置文件,会记录当前项目依赖项.
+* ``npm install package -D``本项目下安装,开发环境需要,生产环境不需要
+* ``npm install package``本项目下安装,开发和生成环境都需要
+* ``npm install package -g``全局安装
+
+### webpack核心概念
+
+* 入口 指示 webpack 应该使用哪个模块，来作为构建其内部依赖图的开始
+```javascript
+单入口
+module.exports={
+    entry:'./src/index.js',//入口
+    output:{
+        path:path.resolve(__dirname,'dist'),//输出目录
+        filename:'my-first-webpack.bundle.js',//输出文件名
+    },//输出
+    mode:'development',//模式
+}
+```
+* 输出 告诉 webpack 在哪里输出它所创建的 bundles，以及如何命名这些文件，默认值为 ./dist
+```javascript
+多入口 多输出
+module.exports={
+    entry:{
+        index:'./src/index.js',
+        app:'./src/app.js'
+    },//入口
+    output:{
+        path:path.resolve(__dirname,'dist'),//输出目录
+        filename:'[name].bundle.js',//输出文件名
+    },//输出
+    mode:'development',//模式
+}
+```
+* loader loader 让 webpack 能够去处理那些非 JavaScript 文件（webpack 自身只理解 JavaScript）
+```javascript
+loader
+module.exports = {
+    entry: {
+        index: './src/index.js',
+        app: './src/app.js'
+    }, //入口
+    output: {
+        path: path.resolve(__dirname, 'dist'), //输出目录
+        filename: '[name].bundle.js', //输出文件名
+    }, //输出
+    module: {
+        //需要在入口文件中引入less文件才可以解析
+        rules: [{
+            test: /\.less$/,
+            use: ['style-loader', 'css-loader', 'less-loader']//从后往前解析
+        }] 
+    },
+    mode: 'development', //模式
+}
+```
+* 插件 loader 被用于转换某些类型的模块，而插件则可以用于执行范围更广的任务
+```javascript
+var HtmlWebpackPlugin = require('html-webpack-plugin');
+//插件
+module.exports = {
+    entry: {
+        index: './src/index.js',
+        app: './src/app.js'
+    }, //入口
+    output: {
+        path: path.resolve(__dirname, 'dist'), //输出目录
+        filename: '[name].bundle.js', //输出文件名
+    }, //输出
+    module: {
+        //需要在入口文件中引入less文件才可以解析
+        rules: [{
+            test: /\.less$/,
+            use: ['style-loader', 'css-loader', 'less-loader']//从后往前解析
+        }] 
+    },
+    plugins:[
+        new HtmlWebpackPlugin()
+    ],
+    mode: 'development', //模式
+}
+```
+
+### 常用插件及loader
+
+* webpack-deep-scope-plugin
+```javascript
+var webpackDeepScopeAnalysisPlugin = require('webpack-deep-scope-plugin').default;
+module.exports={
+    plugins:[
+        new webpackDeepScopeAnalysisPlugin(),
+    ]
+}
+```
+webpack构建生产环境对js的压缩、抖动(过滤一些无用代码),但是对于作用域级别的引用,无法做到很好的抖动.该插件可以弥补这一点,更好的实现抖动
+
+* mini-css-extract-plugin
+```javascript
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+module.exports={
+    module:{
+        rules:[
+            {
+                test:/\.css$/,
+                use:[MiniCssExtractPlugin.loader,'css-loader']
+            }
+        ]
+    },
+    plugins:[
+        new MiniCssExtractPlugin({
+            // Options similar to the same options in webpackOptions.output
+            // all options are optional
+            filename: '[name].css',
+            //chunkFilename: '[id].css',
+            ignoreOrder: false, // Enable to remove warnings about conflicting order
+          }),
+    ],
+    mode:'production'
+}
+```
+此插件将 CSS 提取到单独的文件中,
+
+* purifycss-webpack
+```javascript
+const glob = require('glob-all')
+const PurifyCSSPlugin = require('purifycss-webpack');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+module.exports={
+    module:{
+        rules:[
+            {
+                test:/\.css$/,
+                use:[MiniCssExtractPlugin.loader,'css-loader']
+            }
+        ]
+    },
+    plugins:[
+        new webpackDeepScopeAnalysisPlugin(),
+        new MiniCssExtractPlugin({
+            // Options similar to the same options in webpackOptions.output
+            // all options are optional
+            filename: '[name].css',
+            //chunkFilename: '[id].css',
+            ignoreOrder: false, // Enable to remove warnings about conflicting order
+          }),
+        new PurifyCSSPlugin({
+            // Give paths to parse for rules. These should be absolute!
+            // paths: glob.sync(path.join(__dirname, './*.html'),
+            paths: glob.sync(
+                [
+                    path.join(__dirname, './*.html'),
+                    path.join(__dirname,'./src/*.js')
+                ])
+          })
+      
+    ],
+    mode:'production'
+}
+```
+此插件使用PurifyCSS从CSS中删除未使用的选择器
 
 
 ### 出入口、loader、插件
