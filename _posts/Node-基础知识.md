@@ -2,86 +2,12 @@
 title: Node-基础知识
 date: 2019-12-10 15:01:37
 tags:
+- JavaScript
+- node 
+categories: JavaScript
 ---
 
-# less
-
-css预处理器
-
-## 嵌套
-
-```less
-body{
-    margin:0
-    padding:0
-    .wrapper{
-        position:relative;
-    }
-}
-```
-
-## 注释
-
-```css
-//注释  只想被开发人员看到
-/* 包裹注释*/ 会被编译到文件中
-```
-
-
-
-## 变量及运算
-
-```less
-@color:red;
-@w:400px;
-@h:@w+100px;
-body{
-    color:@red
-}
-```
-
-## 作用域
-
-
-变量延迟加载  最后依据30px
-
-```less
-body{
-    @size:15px;
-    font-size:@size;
-    .wrapper{
-        @size:20px;
-        font-size:@size;
-        @size:30px
-    }
-}
-```
-## 混合
-
-```less
-.border{
-    border:solid 1px #ccc;
-
-}
-
-body{
-    .border;
-}
-
-带变量和混合
-
-
-.border(@w,@c){
-    border:@w solid @c
-
-}
-
-body{
-    .border(1px,#000)
-}
-```
-
-# node.js
+## node.js介绍
 
 node.js他是用C++开发的一种运行于服务器端的语言，可以写网站后台程序，可以做服务端应用开发，他的语法就是JAVASCRIPT，会JS，就是会node.js
 
@@ -1360,6 +1286,7 @@ console.log(env.render('extend.html',{
 在开发环境下，可以关闭cache，这样每次重新加载模板，便于实时修改模板。在生产环境下，一定要打开cache，这样就不会有性能问题。
 
 #### MVC
+
 我们已经可以用koa处理不同的URL，还可以用Nunjucks渲染模板。现在，是时候把这两者结合起来了！
 这就是传说中的MVC：Model-View-Controller，中文名“模型-视图-控制器”。
 
@@ -2546,3 +2473,109 @@ webpack -w  不开启服务监听本地文件变化
 ### 热更新
 
 HotModuleReplacementPlugin();插件
+
+## gulp
+
+gulp强调的是前端开发的工作流程，我们可以通过配置一系列的task，定义task处理的事务（例如文件压缩合并、雪碧图、启动server、版本控制等），然后定义执行顺序，来让gulp执行这些task，从而构建项目的整个前端开发流程。
+
+简单说就一个Task Runner
+
+```javascript
+var {
+    watch,
+    series,
+    task,
+    dest,
+    src
+} = require('gulp');
+
+//压缩html插件
+var htmlclean = require('gulp-htmlclean');
+//压缩图片狗比玩意里面的默认插件,非常容易安装失败,多安装即便,再默认源和淘宝源之间尝试切换
+var imageMin = require('gulp-imagemin');
+//压缩js
+var uglify = require('gulp-uglify');
+//去掉js中的调试语句
+const stripDebug = require('gulp-strip-debug');
+//将less转换成css
+var less = require('gulp-less');
+//css压缩
+let cleanCSS = require('gulp-clean-css');
+//css添加前缀
+var postcss = require('gulp-postcss');
+var autoprefixer = require('autoprefixer');
+
+//开启服务器
+var connect = require("gulp-connect");
+
+var folder = {
+    src: "src/",
+    dist: "dist/"
+}
+var devMode = process.env.NODE_ENV == "development";
+//export NODE_ENV=development 设置环境变量
+task("html", function (cb) {
+    //直接输出
+    // src(folder.src + "html/*")
+    //     .pipe(dest(folder.dist + "html/"))
+
+    //压缩输出
+    src(folder.src + "html/*")
+        .pipe(connect.reload())
+        .pipe(htmlclean())
+        .pipe(dest(folder.dist + "html/"))
+    cb();
+});
+
+task("css", function (cb) {
+    src(folder.src + "css/*")
+        .pipe(connect.reload()) //自动刷新的
+        .pipe(cleanCSS())
+        .pipe(dest(folder.dist + "css/"))
+    cb();
+});
+
+task("less", function (cb) {
+    src(folder.src + "less/*")
+        .pipe(less())
+        .pipe(postcss([autoprefixer()]))
+        .pipe(cleanCSS())
+        .pipe(dest(folder.dist + "less/"))
+    cb();
+});
+
+task("js", function (cb) {
+    var page = src(folder.src + "js/*")
+        .pipe(stripDebug())
+        if(!devMode){//判断压缩
+            page.pipe(uglify())
+        }
+        page.pipe(dest(folder.dist + "js/"))
+    cb();
+});
+
+task("image", function (cb) {
+    src(folder.src + "images/*")
+        .pipe(imageMin())
+        .pipe(dest(folder.dist + "images/"))
+    cb();
+});
+
+task("server", function (cb) {
+    connect.server({
+        port: 8888,
+        livereload: true //开启文件变化
+    });
+    cb();
+});
+
+//监听文件
+task("watch", function (cb) {
+    watch(folder.src + "html/*", series("html"));
+    watch(folder.src + "css/*", series("css"));
+    cb();
+});
+
+exports.default = series("html", "js", "css", "less", "image", "server", "watch");
+```
+

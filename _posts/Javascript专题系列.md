@@ -673,32 +673,7 @@ function getStyle(elem,prop){
 ```
 
 
-# js执行机制
 
-js语言设计的一个很重要的点是,js是没有多线程的.js引擎的执行是单线程执行.这个特性曾经困扰我很久,我想不明白既然js是单线程的,那么是谁来为定时器计时的?是谁来发送ajax请求的?我陷入了一个盲区.即将js等同于浏览器.我们习惯了在浏览器里面执行代码,却忽略了浏览器本身.js引擎是单线程的,可是浏览器却可以是多线程的,js引擎只是浏览器的一个线程而已.定时器计时,网络请求,浏览器渲染等等.都是由不同的线程去完成的. 
-
-```javascript
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
-    
-</body>
-<script>
-    var isEnd = true;
-    window.setTimeout(function () {
-        isEnd = false;//1s后，改变isEnd的值
-    }, 1000);
-    while (isEnd);
-    alert('end');
-</script>
-</html>
-```
-
-isEnd默认是true的,在while中是死循环的.最后的alert是不会执行的. 我添加了一个定时器,1秒后将isEnd改为false. 如果说js引擎是多线程的,那么在1秒后,alert就会被执行.然而实际情况是,页面会永远死循环下去.alert并没有执行.这很好的证明了,settimeout并不能作为多线程使用.js引擎执行是单线程的.
 
 ## 浏览器常驻线程
 

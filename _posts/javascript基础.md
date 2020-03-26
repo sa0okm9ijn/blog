@@ -1440,8 +1440,8 @@ for循环for-in循环最大的区别:for循环可以循环到稀松数组项，f
 
 特殊点：
 
-1. Function的__proto__指向自身的prototype
-2. Object的prototype的__proto__指向null
+1. Function的``__proto__``指向自身的prototype
+2. Object的prototype的``__proto__``指向null
 
 ![](6.jpg)
 
@@ -1475,7 +1475,7 @@ console.log(Function.prototype.__proto__ === Object.prototype); //true
 
 ## 基础方法
 
-W3C不推荐直接使用系统成员__proto__,会有性能上的损失
+W3C不推荐直接使用系统成员``__proto__``,会有性能上的损失
 
 关于静态方法和实例方法
 
@@ -1756,16 +1756,24 @@ Active Object：AO，当前正在执行的上下文中的VO
 # 作用域链
 
 1. VO中包含一个额外的属性，该属性指向创建该VO的函数本身
-2. 每个函数在创建时，会有一个隐藏属性```[[scope]]```，它指向创建该函数时的AO
-3. 当访问一个变量时，会先查找自身VO中是否存在，如果不存在，则依次查找```[[scope]]```属性。
+2. 每个函数在创建时，会有一个隐藏属性``[[scope]]``，它指向创建该函数时的AO
+3. 当访问一个变量时，会先查找自身VO中是否存在，如果不存在，则依次查找``[[scope]]``属性。
 
-某些浏览器会优化作用域链，函数的```[[scope]]```中仅保留需要用到的数据。 
+某些浏览器会优化作用域链，函数的``[[scope]]``中仅保留需要用到的数据。 
 
 ![](2019-11-04_060052.png)
 
 # 事件循环
 
-异步：某些函数不会立即执行，需要等到某个时机成熟后才会执行，该函数叫做异步函数。
+JS运行的环境称之为宿主环境。
+
+执行栈：call stack，一个数据结构，用于存放各种函数的执行环境，每一个函数执行之前，它的相关信息会加入到执行栈。函数调用之前，创建执行环境，然后加入到执行栈；函数调用之后，销毁执行环境。
+
+JS引擎永远执行的是执行栈的最顶部。
+
+异步函数：某些函数不会立即执行，需要等到某个时机到达后才会执行，这样的函数称之为异步函数。比如事件处理函数。异步函数的执行时机，会被宿主环境控制。
+
+js语言设计的一个很重要的点是,js是没有多线程的.js引擎的执行是单线程执行.这个特性曾经困扰我很久,我想不明白既然js是单线程的,那么是谁来为定时器计时的?是谁来发送ajax请求的?我陷入了一个盲区.即将js等同于浏览器.我们习惯了在浏览器里面执行代码,却忽略了浏览器本身.js引擎是单线程的,可是浏览器却可以是多线程的,js引擎只是浏览器的一个线程而已.定时器计时,网络请求,浏览器渲染等等.都是由不同的线程去完成的. 
 
 浏览器的线程：
 
@@ -1777,9 +1785,93 @@ Active Object：AO，当前正在执行的上下文中的VO
 
 事件队列：一块内存空间，用于存放执行时机到达的异步函数。当JS引擎空闲（执行栈没有可执行的上下文），它会从事件队列中拿出第一个函数执行。
 
+当上面的线程发生了某些事请，如果该线程发现，这件事情有处理程序，它会将该处理程序加入一个叫做事件队列的内存。当JS引擎发现，执行栈中已经没有了任何内容后，会将事件队列中的第一个函数加入到执行栈中执行。
+
+JS引擎对事件队列的取出执行方式，以及与宿主环境的配合，称之为事件循环。
+
 事件循环：event loop，是指函数在执行栈、宿主线程、事件队列中的循环移动。
 
+事件队列在不同的宿主环境中有所差异，大部分宿主环境会将事件队列进行细分。在浏览器中，事件队列分为两种：
+
+- 宏任务（队列）：macroTask，计时器结束的回调、事件回调、http回调等等绝大部分异步函数进入宏队列
+- 微任务（队列）：MutationObserver，Promise产生的回调进入微队列
+
+> MutationObserver用于监听某个DOM对象的变化
+```js
+let count = 1;
+const ul = document.getElementById("container");
+document.getElementById("btn").onclick = function () {
+    setTimeout(() => {
+        console.log('添加了一个li');
+    }, 0);//宏队列
+    var li = document.createElement("li");
+    li.innerText = count++;
+    ul.appendChild(li);
+}
+const observer = new MutationObserver(function B() {
+    console.log('ul元素发生了变化');//微队列
+});
+observer.observe(ul, {
+    attributes: true,//监听属性的变化
+    childList: true,//监听子元素的变化
+    subtree: true //监听子树的变化
+})
+```
+
+当执行栈清空时，JS引擎首先会将微任务中的所有任务依次执行结束，如果没有微任务，则执行宏任务。
+
 ![](2019-11-04_061721.png)
+
+**一个简单的例子**
+```js
+var isEnd = true;
+window.setTimeout(function () {
+    isEnd = false;//1s后，改变isEnd的值
+}, 1000);
+while (isEnd);
+alert('end');
+//alert 永远不会执行
+```
+## js引擎与GUI引擎是互斥的
+
+谈到这里,就不得不说浏览器的另外一个引擎---GUI渲染引擎. 在js中渲染操作也是异步的.比如dom操作的代码会在事件队列中生成一个任务,js执行到这个任务时就会去调用GUI引擎渲染.
+
+js语言设定js引擎与GUI引擎是互斥的,也就是说GUI引擎在渲染时会阻塞js引擎计算.原因很简单,如果在GUI渲染的时候,js改变了dom,那么就会造成渲染不同步. 我们需要深刻理解js引擎与GUI引擎的关系,因为这与我们平时开发息息相关,我们时长会遇到一些很奇葩的渲染问题.看这个例子
+
+```js
+//html
+<table border=1>
+    <tr><td><button id='do'>Do long calc - bad status!</button></td>
+        <td><div id='status'>Not Calculating yet.</div></td>
+    </tr>
+    <tr><td><button id='do_ok'>Do long calc - good status!</button></td>
+        <td><div id='status_ok'>Not Calculating yet.</div></td>
+    </tr>
+</table>  
+//js
+function long_running(status_div) {
+
+    var result = 0;
+    for (var i = 0; i < 1000; i++) {
+        for (var j = 0; j < 700; j++) {
+            for (var k = 0; k < 300; k++) {
+                result = result + i + j + k;
+            }
+        }
+    }
+    document.querySelector(status_div).innerHTML = 'calclation done' ;
+}
+
+document.querySelector('#do').onclick = function () {
+    document.querySelector('#status').innerHTML = 'calculating....';
+    long_running('#status');
+};
+
+document.querySelector('#do_ok').onclick = function () {
+    document.querySelector('#status_ok').innerHTML = 'calculating....';
+    window.setTimeout(function (){ long_running('#status_ok') }, 0);
+};
+```
 
 # 对象混合和对象克隆
 
