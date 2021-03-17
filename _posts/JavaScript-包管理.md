@@ -70,22 +70,22 @@ npm 由三部分组成：
 ### 包的安装
 
 > 安装（install）即下载包
-> 由于 npm 的官方 registry 服务器位于国外，可能受网速影响导致下载缓慢或失败。因此，安装好 npm 之后，需要重新设置 registry 的地址为国内地址。目前，淘宝 https://registry.npm.taobao.org 提供了国内的 registry 地址，先设置到该地址。设置方式为```npm config set registry https://registry.npm.taobao.org```。设置好后，通过命令```npm config get registry```进行检查
+> 由于 npm 的官方 registry 服务器位于国外，可能受网速影响导致下载缓慢或失败。因此，安装好 npm 之后，需要重新设置 registry 的地址为国内地址。目前，淘宝 https://registry.npm.taobao.org 提供了国内的 registry 地址，先设置到该地址。设置方式为``npm config set registry https://registry.npm.taobao.org``。设置好后，通过命令``npm config get registry``进行检查
 > ![](2019-12-16-10-25-13.png)
 
 npm 安装一个包，分为两种安装方式：
 
 - 本地安装
-  - 使用命令```npm install 包名```或```npm i 包名```即可完成本地安装
-  - 本地安装的包出现在当前目录下的```node_modules```目录中
-  - 随着开发的进展，```node_modules```目录会变得异常庞大，目录下的内容不适合直接传输到生产环境，因此通常使用```.gitignore```文件忽略该目录中的内容
+  - 使用命令``npm install 包名``或``npm i 包名``即可完成本地安装
+  - 本地安装的包出现在当前目录下的``node_modules``目录中
+  - 随着开发的进展，``node_modules``目录会变得异常庞大，目录下的内容不适合直接传输到生产环境，因此通常使用``.gitignore``文件忽略该目录中的内容
   - 本地安装适用于绝大部分的包，它会在当前目录及其子目录中发挥作用
   - 通常在项目的根目录中使用本地安装
-  - 安装一个包的时候，npm 会自动管理依赖，它会下载该包的依赖包到```node_modules```目录中
-  - 如果本地安装的包带有 CLI，npm 会将它的 CLI 脚本文件放置到```node_modules/.bin```下，使用命令```npx 命令名```即可调用 
+  - 安装一个包的时候，npm 会自动管理依赖，它会下载该包的依赖包到``node_modules``目录中
+  - 如果本地安装的包带有 CLI，npm 会将它的 CLI 脚本文件放置到``node_modules/.bin``下，使用命令``npx 命令名``即可调用 
 - 全局安装
-  - 全局安装的包放置在一个特殊的全局目录，该目录可以通过命令```npm config get prefix```查看
-  - 使用命令```npm install --global 包名``` 或 ```npm i -g 包名```
+  - 全局安装的包放置在一个特殊的全局目录，该目录可以通过命令``npm config get prefix``查看
+  - 使用命令``npm install --global 包名`` 或 ``npm i -g 包名``
   - 重要：**全局安装的包并非所有工程可用，它仅提供全局的 CLI 工具**
   - 大部分情况下，都不需要全局安装包，除非：
     - 包的版本非常稳定，很少有大的更新
@@ -132,6 +132,10 @@ npm 将每个使用 npm 的工程本身都看作是一个包，包的信息需�
 **package.json文件最重要的作用，是记录当前工程的依赖**
 1. dependencies：生产环境的依赖包
 2. devDependencies：仅开发环境的依赖包
+
+>随着技术的快速发展，发现初始化 package.json 已经无法满足大家的需求了，越来越多的项目需要进行整个项目的初始化。脚手架工具应运而生，除了有通用的脚手架工具 yeoman, sao 之外，很多项目也会开发针对自己项目的脚手架工具，例如 vue-cli, create-react-app 以及专门用来初始化 ThinkJS 项目的脚手架工具 think-cli等。运行这些工具需要先使用 npm install -g 全局安装这些模块之后才能正常运行。每次都执行这两部操作那其实是有点麻烦的，所以 npm@5.2.0 提供了 npx命令将安装运行两个步骤合二为一，直接执行 npx think-cli 会先安装 think-cli 模块然后执行 think-cli 命令，最终完成脚手架的启动
+
+>可能 npm 的维护者们都比较懒吧，他们发现这么执行还挺累的，所以在 npm@6.1.0 里增加了 npm init <initializer> 这种操作，简单来说就是你执行 npm init vite-app hello-vue3 的话 npm 会补全模块名为 create-vite-app 并执行 npx create-vite-app hello-vue3
 
 配置好依赖后，使用下面的命令即可安装依赖
 
@@ -277,7 +281,7 @@ node_modules/lodash/入口文件
 
 之后，我们就可以运行简单的指令来完成各种操作了
 
-运行方式是 ```npm run 脚本名称```
+运行方式是 ``npm run 脚本名称``
 
 不仅如此，npm 还对某些常用的脚本名称进行了简化，下面的脚本名称是不需要使用run的：
 - start
@@ -441,9 +445,9 @@ npm config delete 配置项
   - 移除淘宝镜像源
   - 到npm官网注册一个账号，并完成邮箱认证
   - 本地使用 npm cli 进行登录
-    - 使用命令```npm login```登录
-    - 使用命令```npm whoami```查看当前登录的账号
-    - 使用命令```npm logout```注销
+    - 使用命令``npm login``登录
+    - 使用命令``npm whoami``查看当前登录的账号
+    - 使用命令``npm logout``注销
   - 创建工程根目录
   - 使用npm init进行初始化
     - 关于协议
@@ -452,7 +456,7 @@ npm config delete 配置项
 - 发布
   - 开发
   - 确定版本
-  - 使用命令```npm publish```完成发布
+  - 使用命令``npm publish``完成发布
 
 
 ## yarn
@@ -504,28 +508,28 @@ npm6 之后，可以说npm已经和yarn非常接近，甚至没有差距了。�
 1. **初始化**
 初始化:``yarn init [--yes/-y]``
 2. **安装**
-添加指定包：```yarn [global] add package-name [--dev/-D] [--exact/-E]```
+添加指定包：``yarn [global] add package-name [--dev/-D] [--exact/-E]``
 
-安装package.json中的所有依赖：```yarn install [--production/--prod]```
+安装package.json中的所有依赖：``yarn install [--production/--prod]``
 3. **脚本和本地CLI**
 
-运行脚本：```yarn run 脚本名``` 
+运行脚本：``yarn run 脚本名`` 
 
 > start、stop、test可以省略run
 
-运行本地安装的CLI：```yarn run CLI名```
+运行本地安装的CLI：``yarn run CLI名``
 4. **查询**
-查看bin目录：```yarn [global] bin```
-查询包信息：```yarn info 包名 [子字段]```
-列举已安装的依赖：```yarn [global] list [--depth=依赖深度]```
+查看bin目录：``yarn [global] bin``
+查询包信息：``yarn info 包名 [子字段]``
+列举已安装的依赖：``yarn [global] list [--depth=依赖深度]``
 
 > yarn的list命令和npm的list不同，yarn输出的信息更加丰富，包括顶级目录结构、每个包的依赖版本号
 
 5. **更新**
-列举需要更新的包：```yarn outdated```
-更新包：```yarn [global] upgrade [包名]```
+列举需要更新的包：``yarn outdated``
+更新包：``yarn [global] upgrade [包名]``
 6. **卸载**
-卸载包：```yarn remove 包名```
+卸载包：``yarn remove 包名``
 
 ### yarn的特别礼物
 
@@ -533,12 +537,12 @@ npm6 之后，可以说npm已经和yarn非常接近，甚至没有差距了。�
 
 1. **yarn check**
 
-使用```yarn check```命令，可以验证package.json文件的依赖记录和lock文件是否一致
+使用``yarn check``命令，可以验证package.json文件的依赖记录和lock文件是否一致
 这对于防止篡改非常有用
 
 2. **yarn audit**
 
-使用```yarn audit```命令，可以检查本地安装的包有哪些已知漏洞，以表格的形式列出，漏洞级别分为以下几种：
+使用``yarn audit``命令，可以检查本地安装的包有哪些已知漏洞，以表格的形式列出，漏洞级别分为以下几种：
 
 - INFO：信息级别
 - LOW: 低级别
@@ -548,7 +552,7 @@ npm6 之后，可以说npm已经和yarn非常接近，甚至没有差距了。�
 
 3. **yarn why**
 
-使用```yarn why 包名```命令，可以在控制台打印出为什么安装了这个包，哪些包会用到它
+使用``yarn why 包名``命令，可以在控制台打印出为什么安装了这个包，哪些包会用到它
 
 4. **yarn create**
 
@@ -561,9 +565,9 @@ npm6 之后，可以说npm已经和yarn非常接近，甚至没有差距了。�
 1) 全局安装脚手架工具
 2) 使用全局命令搭建脚手架
 
-由于大部分脚手架工具都是以```create-xxx```的方式命名的，比如react的官方脚手架名称为```create-react-app```
+由于大部分脚手架工具都是以``create-xxx``的方式命名的，比如react的官方脚手架名称为``create-react-app``
 
-因此，可以使用```yarn create```命令来一步完成安装和搭建
+因此，可以使用``yarn create``命令来一步完成安装和搭建
 
 例如：
 
